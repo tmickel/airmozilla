@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+{% set page = page|default('home') -%}
+<html LANG="{{ LANG }}" dir="{{ DIR }}">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <title>{% block page_title %}Air Mozilla Management{% endblock %}</title>
+
+    {% block site_css %}
+      {{ css('manage_css') }}
+    {% endblock %}
+  </head>
+  <body>
+    <div class="container-fluid">
+    <div class="row">
+        <div class="span12" id="logo">
+            <img id="logo-img" src="{{ MEDIA_URL }}img/logo-airmo-lg.png" alt="Air Mozilla">
+       		<div class="row">
+            <div id="menu" class="span3">
+                <ul class="nav nav-list">
+                    <li class="nav-header">Management Tools</li>
+                    <li {% if page == "home" %} class="active" {% endif %}>
+                        <a href="{{ url('manage.home') }}">Welcome</a>
+                    </li>
+                    <li><a href="{{ url('auth.logout') }}">Log Out</a></li>
+                    {% if perms.change_user %}
+                    <li class="nav-header">Users and groups</li>
+                    <li {% if page == "user_edit" %} class="active" {% endif %}>
+                        <a href="{{ url('manage.user_edit') }}">
+                            Edit users
+                        </a>
+                    </li>
+                        {% if perms.change_group %}
+                        <li {% if page == "group" %} class="active" {% endif %}>
+                            <a href="{{ url('manage.group_edit') }}">
+                                Group permissions
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                    <li class="nav-header">Event tools</li>
+                    {% if perms.manage.event_request %}
+                    <li {% if page == "erequest" %} class="active" {% endif %}>
+                        <a href="{{ url('manage.event_request') }}">
+                            Event request
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if perms.manage.participant_edit %}
+                    <li {% if page == "part_edit" %} class="active" {% endif %}>
+                        <a href="{{ url('manage.participant_edit') }}">
+                            Participant editor
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if perms.manage.produce_events %}
+                    <li {% if page == "events" %} class="active" {% endif %}>
+                        <a href="{{ url('manage.event_edit') }}">
+                        Edit events
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+	    	</div>
+   
+		    <div id="content" class="span9">
+		        <h2>{% block manage_title %}{% endblock %}</h2>
+		        {% block content %}{% endblock %}
+		    </div>
+            </div>
+		</div>
+	</div>
+    </div>
+    {% block site_js %}
+      {{ js('main_js') }}
+    {% endblock %}
+  </body>
+</html>
+
