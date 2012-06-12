@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
 
-
 from funfactory.urlresolvers import reverse
 
 from nose.tools import eq_
