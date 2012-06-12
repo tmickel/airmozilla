@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import UserChangeForm
 
+
 class UserEditForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super(UserEditForm, self).__init__(*args, **kwargs)
@@ -11,8 +12,9 @@ class UserEditForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('is_active', 'is_staff', 'is_superuser', 
+        fields = ('is_active', 'is_staff', 'is_superuser',
                   'groups', 'user_permissions')
+
 
 class GroupEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -20,7 +22,8 @@ class GroupEditForm(forms.ModelForm):
         self.fields['name'].required = True
         choices = self.fields['permissions'].choices
         self.fields['permissions'] = forms.MultipleChoiceField(choices=choices,
-                                            widget=forms.CheckboxSelectMultiple,
-                                            required=False)
+                                           widget=forms.CheckboxSelectMultiple,
+                                           required=False)
+
     class Meta:
         model = Group
