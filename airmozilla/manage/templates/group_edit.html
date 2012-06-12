@@ -8,9 +8,6 @@ Editing group {{ g.name }}
 <form action="{{ url('manage.group_edit', g.id) }}" method="post">
 {{ csrf() }}
 {{ bootstrapform(form) }}
-<div class="form-actions">
-    <button type="submit" class="btn btn-primary">Save changes</button>
-    <button class="btn">Cancel</button>
-</div>
+{% include '_form_buttons.html' %}
 </form>
 {% endblock %}
