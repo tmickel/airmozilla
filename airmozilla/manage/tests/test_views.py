@@ -1,54 +1,61 @@
+from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
 
 from funfactory.urlresolvers import reverse
 
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 
 class TestPermissions(TestCase):
-    def _staff_login(self, is_staff=True):
-        u = User.objects.create_user('fake', 'fake@fake.com', 'fake')
-        u.is_staff = is_staff
-        u.save()
-        self.client.login(username='fake', password='fake')
-        return u
+    def _login(self, is_staff):
+        user = User.objects.create_user('fake', 'fake@fake.com', 'fake')
+        user.is_staff = is_staff
+        user.save()
+        assert self.client.login(username='fake', password='fake')
+        return user
+
+    def _redirect_ok(self, response, redirect_url):
+        eq_(response.status_code, 302)
+        url = response['Location'].replace('http://testserver', '')
+        url = url.split('?')[0]
+        eq_(url, redirect_url)
 
     def test_unauthorized(self):
         """ Client with no log in - should be rejected. """
         response = self.client.get(reverse('manage.home'))
-        eq_(response.status_code, 302)
+        self._redirect_ok(response, settings.LOGIN_URL)
 
     def test_not_staff(self):
         """ User is not staff - should be rejected. """
-        self._staff_login(False)
+        self._login(is_staff=False)
         response = self.client.get(reverse('manage.home'))
-        eq_(response.status_code, 302)
+        self._redirect_ok(response, settings.LOGIN_URL)
 
     def test_staff_home(self):
         """ User is staff - should get an OK homepage. """
-        self._staff_login()
+        self._login(is_staff=True)
         response = self.client.get(reverse('manage.home'))
         eq_(response.status_code, 200)
 
     def test_staff_logout(self):
         """ Log out makes admin inaccessible. """
-        self._staff_login()
+        self._login(is_staff=True)
         self.client.get(reverse('auth.logout'))
         response = self.client.get(reverse('manage.home'))
-        eq_(response.status_code, 302)
+        self._redirect_ok(response, settings.LOGIN_URL)
 
     def test_edit_user(self):
         """ Unprivileged admin - shouldn't see user change page. """
-        self._staff_login()
+        self._login(is_staff=True)
         response = self.client.get(reverse('manage.users'))
-        eq_(response.status_code, 302)
+        self._redirect_ok(response, settings.LOGIN_URL)
 
 
 class TestUsersAndGroups(TestCase):
     def setUp(self):
         User.objects.create_superuser('fake', 'fake@fake.com', 'fake')
-        self.client.login(username='fake', password='fake')
+        assert self.client.login(username='fake', password='fake')
 
     def test_user_edit(self):
         """ Add superuser and staff status via the user edit form. """
@@ -63,8 +70,8 @@ class TestUsersAndGroups(TestCase):
         )
         eq_(response.status_code, 302)
         user = User.objects.get(id=user.id)
-        self.assertTrue(user.is_superuser)
-        self.assertTrue(user.is_staff)
+        ok_(user.is_superuser)
+        ok_(user.is_staff)
 
     def test_group_add(self):
         """ Add a group. """
@@ -76,5 +83,5 @@ class TestUsersAndGroups(TestCase):
         eq_(response.status_code, 302)
 
         group = Group.objects.get(name='fake_group')
-        self.assertTrue(group is not None)
-        self.assertTrue(group.name == 'fake_group')
+        ok_(group is not None)
+        eq_(group.name, 'fake_group')
