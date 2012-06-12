@@ -1,11 +1,11 @@
-{% extends "user_edit.html" %}
+{% extends "groups.html" %}
 
 {% block manage_title %}
-Editing user {{ u.email }}
+New group
 {% endblock %}
 
 {% block content %}
-<form action="{{ url('manage.user_edit_form', u.id) }}" method="post">
+<form action="{{ url('manage.group_new') }}" method="post">
 {{ csrf() }}
 {{ bootstrapform(form) }}
 <div class="form-actions">

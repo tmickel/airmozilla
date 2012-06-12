@@ -19,19 +19,25 @@
                 <ul class="nav nav-list">
                     <li class="nav-header">Management Tools</li>
                     <li {% if page == "home" %} class="active" {% endif %}>
-                        <a href="{{ url('manage.home') }}">Welcome</a>
+                        <a href="{{ url('manage.home') }}">
+                        <i class="icon-home"></i>
+                        Welcome</a>
                     </li>
-                    <li><a href="{{ url('auth.logout') }}">Log Out</a></li>
+                    <li><a href="{{ url('auth.logout') }}">
+                        <i class="icon-off"></i>
+                        Log Out</a></li>
                     {% if perms.change_user %}
                     <li class="nav-header">Users and groups</li>
-                    <li {% if page == "user_edit" %} class="active" {% endif %}>
-                        <a href="{{ url('manage.user_edit') }}">
+                    <li {% if page == "users" %} class="active" {% endif %}>
+                        <a href="{{ url('manage.users') }}">
+                            <i class="icon-user"></i>
                             Edit users
                         </a>
                     </li>
                         {% if perms.change_group %}
-                        <li {% if page == "group" %} class="active" {% endif %}>
-                            <a href="{{ url('manage.group_edit') }}">
+                        <li {% if page == "groups" %} class="active" {% endif %}>
+                            <a href="{{ url('manage.groups') }}">
+                                <i class="icon-lock"></i>
                                 Group permissions
                             </a>
                         </li>
@@ -41,6 +47,7 @@
                     {% if perms.manage.event_request %}
                     <li {% if page == "erequest" %} class="active" {% endif %}>
                         <a href="{{ url('manage.event_request') }}">
+                            <i class="icon-calendar"></i>
                             Event request
                         </a>
                     </li>
@@ -48,6 +55,7 @@
                     {% if perms.manage.participant_edit %}
                     <li {% if page == "part_edit" %} class="active" {% endif %}>
                         <a href="{{ url('manage.participant_edit') }}">
+                            <i class="icon-picture"></i>
                             Participant editor
                         </a>
                     </li>
@@ -55,6 +63,7 @@
                     {% if perms.manage.produce_events %}
                     <li {% if page == "events" %} class="active" {% endif %}>
                         <a href="{{ url('manage.event_edit') }}">
+                        <i class="icon-facetime-video"></i>
                         Edit events
                         </a>
                     </li>

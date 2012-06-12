@@ -1,41 +1,16 @@
-{% extends "manage_base.html" %}
-{% set page = "user_edit" %}
+{% extends "users.html" %}
 
 {% block manage_title %}
-    Edit users
+Editing user {{ u.email }}
 {% endblock %}
 
 {% block content %}
-    <table id="current_users" class="table table-striped table-bordered">
-    <thead>
-    <tr>
-        <th>Email</th>
-        <th>Group(s)</th>
-        <th>Permission grants</th>
-        <th>Last login</th>
-        <th>Staff?</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for u in users %}
-        <tr>
-            <td>{{ u.email }}</td>
-            <td>{% for g in u.groups.all() %}
-                    <p>{{ g }}</p>
-                {% endfor %}
-            </td>
-            <td>
-                {{ '<strong>Superuser</strong>'|safe if u.is_superuser }}
-                {% for p in u.user_permissions.all() %}
-                    <p>{{ p }}</p>
-                {% endfor %}
-            </td>
-            <td>{{ u.last_login }}</td>
-            <td>{{ 'Yes' if u.is_staff else 'No' }}</td>
-            <td><a href="{{ url('manage.user_edit_form', u.id) }} " class="btn">Edit</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-    </table>
+<form action="{{ url('manage.user_edit', u.id) }}" method="post">
+{{ csrf() }}
+{{ bootstrapform(form) }}
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">Save changes</button>
+    <button class="btn">Cancel</button>
+</div>
+</form>
 {% endblock %}
