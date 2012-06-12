@@ -17,7 +17,7 @@ MINIFY_BUNDLES = {
             'css/main/main.css',
         ),
         'manage_css': (
-			'css/manage/bootstrap.min.css',
+            'css/manage/bootstrap.min.css',
             'css/manage/manage.css',
         )
     },
@@ -26,9 +26,6 @@ MINIFY_BUNDLES = {
             'js/main/libs/jquery-1.7.2.min.js',
             'js/main/libs/jquery.cookie.js',
         ),
-		'manage_js': (
-			'js/manage/bootstrap.min.js',
-		),
     }
 }
 
