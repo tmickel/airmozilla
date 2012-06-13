@@ -15,22 +15,18 @@ class TestPermissions(TestCase):
         assert self.client.login(username='fake', password='fake')
         return user
 
-    def _redirect_ok(self, response, redirect_url):
-        eq_(response.status_code, 302)
-        url = response['Location'].replace('http://testserver', '')
-        url = url.split('?')[0]
-        eq_(url, redirect_url)
-
     def test_unauthorized(self):
         """ Client with no log in - should be rejected. """
         response = self.client.get(reverse('manage.home'))
-        self._redirect_ok(response, settings.LOGIN_URL)
+        self.assertRedirects(response, settings.LOGIN_URL
+                             + '?next=' + reverse('manage.home'))
 
     def test_not_staff(self):
         """ User is not staff - should be rejected. """
         self._login(is_staff=False)
         response = self.client.get(reverse('manage.home'))
-        self._redirect_ok(response, settings.LOGIN_URL)
+        self.assertRedirects(response, settings.LOGIN_URL
+                             + '?next=' + reverse('manage.home'))
 
     def test_staff_home(self):
         """ User is staff - should get an OK homepage. """
@@ -43,13 +39,15 @@ class TestPermissions(TestCase):
         self._login(is_staff=True)
         self.client.get(reverse('auth.logout'))
         response = self.client.get(reverse('manage.home'))
-        self._redirect_ok(response, settings.LOGIN_URL)
+        self.assertRedirects(response, settings.LOGIN_URL
+                             + '?next=' + reverse('manage.home'))
 
     def test_edit_user(self):
         """ Unprivileged admin - shouldn't see user change page. """
         self._login(is_staff=True)
         response = self.client.get(reverse('manage.users'))
-        self._redirect_ok(response, settings.LOGIN_URL)
+        self.assertRedirects(response, settings.LOGIN_URL
+                             + '?next=' + reverse('manage.users'))
 
 
 class TestUsersAndGroups(TestCase):
@@ -81,7 +79,6 @@ class TestUsersAndGroups(TestCase):
             }
         )
         eq_(response.status_code, 302)
-
         group = Group.objects.get(name='fake_group')
         ok_(group is not None)
         eq_(group.name, 'fake_group')
