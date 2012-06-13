@@ -29,6 +29,8 @@ class UserFindForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).count() == 0:
+        try:
+            user = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
             raise forms.ValidationError('User with this email not found.')
-        return email
+        return user.email
