@@ -46,8 +46,10 @@ class EventRequestForm(forms.ModelForm):
         split_tags = tags.split(',')
         final_tags = []
         for tag_name in split_tags:
-            t, created = Tag.objects.get_or_create(name=tag_name)
-            final_tags.append(t)
+            tag_name = tag_name.strip()
+            if tag_name:
+                t, __ = Tag.objects.get_or_create(name=tag_name)
+                final_tags.append(t)
         return final_tags
 
     class Meta:
