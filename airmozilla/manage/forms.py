@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, Group
 
-from airmozilla.main.models import Event, Tag
+from airmozilla.main.models import Category, Event, Tag
 
 
 class UserEditForm(forms.ModelForm):
@@ -59,3 +59,7 @@ class EventRequestForm(forms.ModelForm):
             'call_info': forms.Textarea(attrs={'rows': 3}),
             'additional_links': forms.Textarea(attrs={'rows': 3})
         }
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
