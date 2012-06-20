@@ -1,14 +1,9 @@
-import logging
-
 from django.shortcuts import render
 
-import commonware
-from funfactory.log import log_cef
-
-
-log = commonware.log.getLogger('playdoh')
+from airmozilla.main.models import Event
 
 
 def home(request, template='main/home.html'):
     """Main view."""
-    return render(request, template)
+    e = Event.objects.filter()[0]  # demonstration of TZ tools
+    return render(request, template, {'event': e})
