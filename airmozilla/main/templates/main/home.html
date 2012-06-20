@@ -16,7 +16,7 @@
         {{ browserid_form.as_p() }}
     </form>
 {% endif %}
-    <p>{{ event.start_time|js_date }}</p>
+    <p>{{ event.start_time|js_date('ddd, MMM D, YYYY, h:mma UTCZZ') }} (local time)</p>
 {% endblock %}
 
 {% block site_js %}
@@ -25,6 +25,7 @@
         {{ browserid_form.media }}
     {% endif %}
     {% compress js %}
+        <script src="{{ static('js/libs/moment.min.js') }}"></script>
         <script src="{{ static('main/js/timezone.js') }}"></script>
     {% endcompress %}
 {% endblock %}
