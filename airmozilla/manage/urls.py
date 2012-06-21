@@ -24,5 +24,5 @@ urlpatterns = patterns('',
                                        name='participant_edit'),
     url(r'^participants', views.participants,
                           name='participants'),
-    url(r'^categories', views.categories, name='categories'), 
+    url(r'^categories', views.categories, name='categories'),
 )

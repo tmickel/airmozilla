@@ -136,6 +136,7 @@ def participant_autocomplete(request):
     result = {'participants': participant_names}
     return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
+
 @staff_required
 @permission_required('change_participant')
 def participants(request):
@@ -158,7 +159,7 @@ def participants(request):
         participants_paged = paginator.page(1)
     except EmptyPage:
         participants_paged = paginator.page(paginator.num_pages)
-    return render(request, 'manage/participants.html', 
+    return render(request, 'manage/participants.html',
                   {'participants': participants_paged, 'form': search_form})
 
 
@@ -168,15 +169,16 @@ def participant_edit(request, id):
     """ Participant edit page:  update biographical info. """
     participant = Participant.objects.get(id=id)
     if request.method == 'POST':
-        form = ParticipantEditForm(request.POST, request.FILES, 
+        form = ParticipantEditForm(request.POST, request.FILES,
                                    instance=participant)
         if form.is_valid():
             form.save()
             return redirect('manage:participants')
     else:
         form = ParticipantEditForm(instance=participant)
-    return render(request, 'manage/participant_edit.html', 
+    return render(request, 'manage/participant_edit.html',
                   {'form': form, 'participant': participant})
+
 
 @staff_required
 @permission_required('add_participant')
@@ -211,5 +213,5 @@ def categories(request):
             form = CategoryForm()
     else:
         form = CategoryForm()
-    return render(request, 'manage/categories.html', 
+    return render(request, 'manage/categories.html',
                   {'categories': categories, 'form': form})

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group
 
 from funfactory.urlresolvers import reverse
 
-from airmozilla.base.forms import BaseModelForm 
+from airmozilla.base.forms import BaseModelForm
 from airmozilla.main.models import Category, Event, Participant, Tag
 
 
@@ -44,6 +44,7 @@ class UserFindForm(BaseModelForm):
 class EventRequestForm(BaseModelForm):
     tags = forms.CharField()
     participants = forms.CharField()
+
     def __init__(self, *args, **kwargs):
         super(EventRequestForm, self).__init__(*args, **kwargs)
         self.fields['participants'].help_text = \
@@ -82,20 +83,23 @@ class EventRequestForm(BaseModelForm):
             'additional_links': forms.Textarea(attrs={'rows': 3})
         }
 
+
 class ParticipantEditForm(BaseModelForm):
     class Meta:
         model = Participant
+
 
 class ParticipantFindForm(BaseModelForm):
     class Meta:
         model = Participant
         fields = ('name',)
-    
+
     def clean_name(self):
         name = self.cleaned_data['name']
         if not Participant.objects.filter(name__icontains=name):
-            raise forms.ValidationError('No participants with this name found.')
+            raise forms.ValidationError('No participant with this name found.')
         return name
+
 
 class CategoryForm(BaseModelForm):
     class Meta:
