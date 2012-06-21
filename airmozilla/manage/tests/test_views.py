@@ -82,3 +82,20 @@ class TestUsersAndGroups(TestCase):
         group = Group.objects.get(name='fake_group')
         ok_(group is not None)
         eq_(group.name, 'fake_group')
+
+    def test_user_search(self):
+        """ Test searching for some user that we create. """
+        user = User.objects.create_user('t', 'testuser@mozilla.com')
+        response = self.client.post(reverse('manage:users'),
+            {
+                'email': user.email
+            }
+        )
+        eq_(response.status_code, 302)
+        self.assertRedirects(response, reverse('manage:user_edit',
+                                               kwargs={'id': user.id}))
+
+class TestEvents(TestCase):
+    def setUp(self):
+        User.objects.create_superuser('fake')
+        assert self.client.login(username='fake')
