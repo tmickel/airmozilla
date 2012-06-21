@@ -6,9 +6,10 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import simplejson
 
-from airmozilla.main.models import Category, Event, Tag
+from airmozilla.main.models import Category, Event, Participant, Tag
 from airmozilla.manage.forms import CategoryForm, GroupEditForm, \
-                                    EventRequestForm, UserEditForm, \
+                                    EventRequestForm, ParticipantEditForm, \
+                                    ParticipantFindForm, UserEditForm, \
                                     UserFindForm
 
 staff_required = user_passes_test(lambda u: u.is_staff)
@@ -126,10 +127,70 @@ def tag_autocomplete(request):
 
 
 @staff_required
+@permission_required('add_event')
+def participant_autocomplete(request):
+    """ Participant names to Event Request autocompleter. """
+    query = request.GET['q']
+    participants = Participant.objects.filter(name__icontains=query)[:5]
+    participant_names = [{'id': p.name, 'text': p.name} for p in participants]
+    result = {'participants': participant_names}
+    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+
+@staff_required
 @permission_required('change_participant')
-def participant_edit(request):
-    """Participant editor page:  update biographical info."""
-    return render(request, 'manage/participant_edit.html')
+def participants(request):
+    """Participants page:  view and search participants/speakers. """
+    if request.method == 'POST':
+        search_form = ParticipantFindForm(request.POST)
+        if search_form.is_valid():
+            participants = Participant.objects.filter(name__icontains=
+                                       search_form.cleaned_data['name'])
+        else:
+            participants = Participant.objects.all()
+    else:
+        participants = Participant.objects.all()
+        search_form = ParticipantFindForm()
+    paginator = Paginator(participants, 10)
+    page = request.GET.get('page')
+    try:
+        participants_paged = paginator.page(page)
+    except PageNotAnInteger:
+        participants_paged = paginator.page(1)
+    except EmptyPage:
+        participants_paged = paginator.page(paginator.num_pages)
+    return render(request, 'manage/participants.html', 
+                  {'participants': participants_paged, 'form': search_form})
+
+
+@staff_required
+@permission_required('changed_participant')
+def participant_edit(request, id):
+    """ Participant edit page:  update biographical info. """
+    participant = Participant.objects.get(id=id)
+    if request.method == 'POST':
+        form = ParticipantEditForm(request.POST, request.FILES, 
+                                   instance=participant)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:participants')
+    else:
+        form = ParticipantEditForm(instance=participant)
+    return render(request, 'manage/participant_edit.html', 
+                  {'form': form, 'participant': participant})
+
+@staff_required
+@permission_required('add_participant')
+def participant_new(request):
+    if request.method == 'POST':
+        form = ParticipantEditForm(request.POST, request.FILES,
+                                   instance=Participant())
+        if form.is_valid():
+            form.save()
+            return redirect('manage:participants')
+    else:
+        form = ParticipantEditForm()
+    return render(request, 'manage/participant_new.html',
+                  {'form': form})
 
 
 @staff_required
@@ -137,6 +198,7 @@ def participant_edit(request):
 def event_edit(request):
     """Event edit/production:  change, approve, publish events."""
     return render(request, 'manage/event_edit.html')
+
 
 @staff_required
 @permission_required('change_category')
