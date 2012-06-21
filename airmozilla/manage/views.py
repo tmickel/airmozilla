@@ -4,8 +4,8 @@ from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.utils import simplejson
 
+from airmozilla.base.utils import json_view
 from airmozilla.main.models import Category, Event, Participant, Tag
 from airmozilla.manage.forms import CategoryForm, GroupEditForm, \
                                     EventRequestForm, ParticipantEditForm, \
@@ -115,6 +115,7 @@ def event_request(request):
 
 @staff_required
 @permission_required('add_event')
+@json_view
 def tag_autocomplete(request):
     """ Feeds JSON tag names to the Event Request form. """
     query = request.GET['q']
@@ -122,19 +123,18 @@ def tag_autocomplete(request):
     tag_names = [{'id': t.name, 'text': t.name} for t in tags]
     # for new tags - the first tag is the query
     tag_names.insert(0, {'id': query, 'text': query})
-    result = {'tags': tag_names}
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+    return {'tags': tag_names}
 
 
 @staff_required
 @permission_required('add_event')
+@json_view
 def participant_autocomplete(request):
     """ Participant names to Event Request autocompleter. """
     query = request.GET['q']
     participants = Participant.objects.filter(name__icontains=query)[:5]
     participant_names = [{'id': p.name, 'text': p.name} for p in participants]
-    result = {'participants': participant_names}
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+    return {'participants': participant_names}
 
 
 @staff_required
