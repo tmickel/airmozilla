@@ -55,24 +55,21 @@ class EventRequestForm(BaseModelForm):
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']
-        split_tags = tags.split(',')
+        split_tags = [t.strip() for t in tags.split(',') if t.strip()]
         final_tags = []
         for tag_name in split_tags:
-            tag_name = tag_name.strip()
-            if tag_name:
-                t, __ = Tag.objects.get_or_create(name=tag_name)
-                final_tags.append(t)
+            t, __ = Tag.objects.get_or_create(name=tag_name)
+            final_tags.append(t)
         return final_tags
 
     def clean_participants(self):
         participants = self.cleaned_data['participants']
-        split_participants = participants.split(',')
+        split_participants = [p.strip() for p in participants.split(',')
+                              if p.strip()]
         final_participants = []
         for participant_name in split_participants:
-            participant_name = participant_name.strip()
-            if participant_name:
-                p = Participant.objects.get(name=participant_name)
-                final_participants.append(p)
+            p = Participant.objects.get(name=participant_name)
+            final_participants.append(p)
         return final_participants
 
     class Meta:
