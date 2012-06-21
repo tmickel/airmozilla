@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.decorators import permission_required, \
                                            user_passes_test
 from django.contrib.auth.models import User, Group
@@ -133,7 +135,10 @@ def participant_autocomplete(request):
     """ Participant names to Event Request autocompleter. """
     query = request.GET['q']
     participants = Participant.objects.filter(name__icontains=query)[:5]
-    participant_names = [{'id': p.name, 'text': p.name} for p in participants]
+    # Only match names with a component which starts with the query
+    regex = re.compile(r'\b%s' % re.escape(query.split()[0]), re.I)
+    participant_names = [{'id': p.name, 'text': p.name} 
+                         for p in participants if regex.findall(p.name)]
     return {'participants': participant_names}
 
 
