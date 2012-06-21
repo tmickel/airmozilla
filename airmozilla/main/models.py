@@ -61,7 +61,7 @@ class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
     video_url = models.URLField(blank=True)
-    placeholder_img = models.FileField(upload_to=_upload_path, blank=True)
+    placeholder_img = models.FileField(upload_to='placeholders/', blank=True)
     description = models.TextField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(

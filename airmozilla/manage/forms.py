@@ -3,6 +3,9 @@ from django.contrib.auth.models import User, Group
 
 from funfactory.urlresolvers import reverse
 
+from airmozilla.base.forms import BaseModelForm 
+from airmozilla.main.models import Category, Event, Participant, Tag
+
 from airmozilla.base.forms import BaseModelForm
 from airmozilla.main.models import Category, Event, Participant, Tag
 
@@ -44,6 +47,13 @@ class UserFindForm(BaseModelForm):
 class EventRequestForm(BaseModelForm):
     tags = forms.CharField()
     participants = forms.CharField()
+    def __init__(self, *args, **kwargs):
+        super(EventRequestForm, self).__init__(*args, **kwargs)
+        self.fields['participants'].help_text = \
+            '<a href="%s" class="btn" target="_blank"> \
+             <i class="icon-plus-sign"></i> \
+             New Participant \
+             </a>' % reverse('manage:participant_new')
 
     def __init__(self, *args, **kwargs):
         super(EventRequestForm, self).__init__(*args, **kwargs)
@@ -64,12 +74,13 @@ class EventRequestForm(BaseModelForm):
 
     def clean_participants(self):
         participants = self.cleaned_data['participants']
-        split_participants = [p.strip() for p in participants.split(',')
-                              if p.strip()]
+        split_participants = participants.split(',')
         final_participants = []
         for participant_name in split_participants:
-            p = Participant.objects.get(name=participant_name)
-            final_participants.append(p)
+            participant_name = participant_name.strip()
+            if participant_name:
+                p = Participant.objects.get(name=participant_name)
+                final_participants.append(p)
         return final_participants
 
     class Meta:
@@ -80,23 +91,20 @@ class EventRequestForm(BaseModelForm):
             'additional_links': forms.Textarea(attrs={'rows': 3})
         }
 
-
 class ParticipantEditForm(BaseModelForm):
     class Meta:
         model = Participant
-
 
 class ParticipantFindForm(BaseModelForm):
     class Meta:
         model = Participant
         fields = ('name',)
-
+    
     def clean_name(self):
         name = self.cleaned_data['name']
         if not Participant.objects.filter(name__icontains=name):
-            raise forms.ValidationError('No participant with this name found.')
+            raise forms.ValidationError('No participants with this name found.')
         return name
-
 
 class CategoryForm(BaseModelForm):
     class Meta:
