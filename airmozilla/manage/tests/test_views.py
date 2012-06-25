@@ -60,7 +60,7 @@ class TestUsersAndGroups(TestCase):
         assert self.client.login(username='fake', password='fake')
 
     def test_user_group_pages(self):
-        """The user and group listing pages are okay."""
+        """User and group listing pages respond with success."""
         response = self.client.get(reverse('manage:users'))
         eq_(response.status_code, 200)
         response = self.client.get(reverse('manage:users') + '?page=5000')
@@ -208,7 +208,7 @@ class TestEvents(TestCase):
         eq_(parsed_fail, {'participants': []})
 
     def test_event_edit(self):
-        """The event editor page renders."""
+        """The event editor page responds successfully."""
         response = self.client.get(reverse('manage:event_edit'))
         eq_(response.status_code, 200)
 
@@ -246,7 +246,7 @@ class TestParticipants(TestCase):
         ok_(response_fail.content.find('Tim') >= 0)
 
     def test_participant_edit(self):
-        """Participant edit page renders; bad form results in failure;
+        """Participant edit page responds OK; bad form results in failure;
         submission induces a change.
         """
         participant = Participant.objects.get(name='Tim Mickel')
@@ -275,7 +275,7 @@ class TestParticipants(TestCase):
         eq_(response_fail.status_code, 200)
 
     def test_participant_new(self):
-        """New participant page renders and form works as expected."""
+        """New participant page responds OK and form works as expected."""
         response = self.client.get(reverse('manage:participant_new'))
         eq_(response.status_code, 200)
         with open('airmozilla/manage/tests/firefox.png') as fp:
@@ -299,7 +299,7 @@ class TestCategories(TestCase):
         assert self.client.login(username='fake', password='fake')
 
     def test_categories(self):
-        """ Categories listing renders. """
+        """ Categories listing responds OK. """
         response = self.client.get(reverse('manage:categories'))
         eq_(response.status_code, 200)
 
