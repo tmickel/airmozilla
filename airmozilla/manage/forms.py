@@ -6,9 +6,6 @@ from funfactory.urlresolvers import reverse
 from airmozilla.base.forms import BaseModelForm
 from airmozilla.main.models import Category, Event, Participant, Tag
 
-from airmozilla.base.forms import BaseModelForm
-from airmozilla.main.models import Category, Event, Participant, Tag
-
 
 class UserEditForm(BaseModelForm):
     class Meta:
@@ -55,14 +52,6 @@ class EventRequestForm(BaseModelForm):
              <i class="icon-plus-sign"></i> \
              New Participant \
              </a>' % reverse('manage:participant_new')
-
-    def __init__(self, *args, **kwargs):
-        super(EventRequestForm, self).__init__(*args, **kwargs)
-        self.fields['participants'].help_text = (
-             '<a href="%s" class="btn" target="_blank">'
-             '<i class="icon-plus-sign"></i>'
-             'New Participant'
-             '</a>' % reverse('manage:participant_new'))
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']

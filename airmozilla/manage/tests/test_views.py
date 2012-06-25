@@ -8,7 +8,8 @@ from funfactory.urlresolvers import reverse
 
 from nose.tools import eq_, ok_
 
-from airmozilla.main.models import Category, Event, Participant, Tag
+from airmozilla.main.models import Category, Event, Participant
+
 
 class TestPermissions(TestCase):
     def _login(self, is_staff):
@@ -100,7 +101,7 @@ class TestUsersAndGroups(TestCase):
     def test_group_edit(self):
         """Group editing: group name change form sucessfully changes name."""
         group, __ = Group.objects.get_or_create(name='testergroup')
-        response = self.client.get(reverse('manage:group_edit', 
+        response = self.client.get(reverse('manage:group_edit',
                                            kwargs={'id': group.id}))
         eq_(response.status_code, 200)
         response = self.client.post(reverse('manage:group_edit',
@@ -159,7 +160,7 @@ class TestEvents(TestCase):
             )
             response_fail = self.client.post(reverse('manage:event_request'),
                 {
-                    'title': 'Test fails, not enough data!', 
+                    'title': 'Test fails, not enough data!',
                 }
             )
         # update this when there is a proper success page for event requests
@@ -192,7 +193,7 @@ class TestEvents(TestCase):
         eq_(response.status_code, 200)
         parsed = json.loads(response.content)
         ok_('participants' in parsed)
-        participants = [p['text'] for p in parsed['participants'] 
+        participants = [p['text'] for p in parsed['participants']
                             if 'text' in p]
         eq_(len(participants), 1)
         ok_('Tim Mickel' in participants)
@@ -210,6 +211,7 @@ class TestEvents(TestCase):
         """The event editor page renders."""
         response = self.client.get(reverse('manage:event_edit'))
         eq_(response.status_code, 200)
+
 
 class TestParticipants(TestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
@@ -276,7 +278,7 @@ class TestParticipants(TestCase):
         """New participant page renders and form works as expected."""
         response = self.client.get(reverse('manage:participant_new'))
         eq_(response.status_code, 200)
-        with open('airmozilla/manage/tests/firefox.png') as fp:         
+        with open('airmozilla/manage/tests/firefox.png') as fp:
             response_ok = self.client.post(reverse('manage:participant_new'),
                 {
                     'name': 'Mozilla Firefox',

@@ -3,8 +3,6 @@ from django.test import TestCase
 
 from funfactory.urlresolvers import reverse
 
-from nose.tools import eq_
-
 from airmozilla.auth.browserid_mock import mock_browserid
 
 
@@ -18,13 +16,13 @@ class TestViews(TestCase):
     def test_invalid(self):
         """Bad BrowserID form (i.e. no assertion) -> failure."""
         response = self._login_attempt(None, None)
-        self.assertRedirects(response, 
+        self.assertRedirects(response,
                              reverse(settings.LOGIN_REDIRECT_URL_FAILURE))
 
     def test_bad_verification(self):
         """Bad verification -> failure."""
         response = self._login_attempt(None)
-        self.assertRedirects(response,  
+        self.assertRedirects(response, 
                              reverse(settings.LOGIN_REDIRECT_URL_FAILURE))
 
     def test_nonmozilla(self):
@@ -37,5 +35,5 @@ class TestViews(TestCase):
         """Mozilla email -> success."""
         # Try the first allowed domain
         response = self._login_attempt('tmickel@' + settings.ALLOWED_BID[0])
-        self.assertRedirects(response, 
+        self.assertRedirects(response,
                              reverse(settings.LOGIN_REDIRECT_URL))
