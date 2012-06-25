@@ -63,7 +63,7 @@ class TestUsersAndGroups(TestCase):
         """User and group listing pages respond with success."""
         response = self.client.get(reverse('manage:users'))
         eq_(response.status_code, 200)
-        response = self.client.get(reverse('manage:users') + '?page=5000')
+        response = self.client.get(reverse('manage:users'), {'page': 5000})
         eq_(response.status_code, 200)
         response = self.client.get(reverse('manage:groups'))
         eq_(response.status_code, 200)
@@ -224,8 +224,8 @@ class TestParticipants(TestCase):
         """Participants pagination always returns valid pages."""
         response = self.client.get(reverse('manage:participants'))
         eq_(response.status_code, 200)
-        response = self.client.get(reverse('manage:participants') +
-                                    '?page=1000')
+        response = self.client.get(reverse('manage:participants'), 
+                                   {'page': 5000})
         eq_(response.status_code, 200)
 
     def test_participant_find(self):
