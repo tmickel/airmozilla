@@ -47,11 +47,11 @@ class EventRequestForm(BaseModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EventRequestForm, self).__init__(*args, **kwargs)
-        self.fields['participants'].help_text = \
-            '<a href="%s" class="btn" target="_blank"> \
-             <i class="icon-plus-sign"></i> \
-             New Participant \
-             </a>' % reverse('manage:participant_new')
+        self.fields['participants'].help_text = (
+             '<a href="%s" class="btn" target="_blank">'
+             '<i class="icon-plus-sign"></i>'
+             'New Participant'
+             '</a>' % reverse('manage:participant_new'))
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']
@@ -64,13 +64,12 @@ class EventRequestForm(BaseModelForm):
 
     def clean_participants(self):
         participants = self.cleaned_data['participants']
-        split_participants = participants.split(',')
+        split_participants = [p.strip() for p in participants.split(',')
+                              if p.strip()]
         final_participants = []
         for participant_name in split_participants:
-            participant_name = participant_name.strip()
-            if participant_name:
-                p = Participant.objects.get(name=participant_name)
-                final_participants.append(p)
+            p = Participant.objects.get(name=participant_name)
+            final_participants.append(p)
         return final_participants
 
     class Meta:
