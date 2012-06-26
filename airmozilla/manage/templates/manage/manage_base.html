@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% extends "main_base.html" %}
 {% set page = page|default('home') -%}
 {% set navigation_bar = [
     ('', 'Management Tools', '', '', True),
@@ -21,19 +21,16 @@
     (url('manage:categories'), 'Categories', 'categories', 'icon-folder-close',
      perms.change_category)
 ] -%}
-<html LANG="{{ LANG }}" dir="{{ DIR }}">
-  <head>
-    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-    <title>{% block page_title %}Air Mozilla Management{% endblock %}</title>
-
-    {% block site_css %}
-      {% compress css %}
-      <link href="{{ static('manage/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
-      <link href="{{ static('manage/css/manage.css') }}" rel="stylesheet" type="text/css">
-      {% endcompress %}
-    {% endblock %}
-  </head>
-  <body>
+{% block page_title %}
+    Air Mozilla Management
+{% endblock %}
+{% block site_css %}
+    {% compress css %}
+    <link href="{{ static('manage/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ static('manage/css/manage.css') }}" rel="stylesheet" type="text/css">
+    {% endcompress %}
+{% endblock %}
+{% block content %}
     <div class="container-fluid">
     <div class="row">
         <div class="span12" id="logo">
@@ -59,16 +56,15 @@
 	    	</div>
 		    <div id="content" class="span9">
 		        <h2>{% block manage_title %}{% endblock %}</h2>
-		        {% block content %}{% endblock %}
+		        {% block manage_content %}{% endblock %}
 		    </div>
             </div>
 		</div>
 	</div>
     </div>
-    {% block site_js %}
-      {% compress js %}
-      <script src="{{ static('js/libs/jquery-1.7.2.min.js') }}"></script>
-      {% endcompress %}
-    {% endblock %}
-  </body>
-</html>
+{% endblock %}
+{% block site_js %}
+    {% compress js %}
+    <script src="{{ static('js/libs/jquery-1.7.2.min.js') }}"></script>
+    {% endcompress %}
+{% endblock %}
