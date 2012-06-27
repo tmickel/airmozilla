@@ -62,6 +62,12 @@ class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
     video_url = models.URLField(blank=True)
+    STATUS_CHOICES = (
+        ('I', 'Initiated'),
+        ('S', 'Scheduled')
+    )
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, 
+                              default='I')
     placeholder_img = models.FileField(upload_to=_upload_path, blank=True)
     description = models.TextField()
     start_time = models.DateTimeField()
@@ -76,3 +82,4 @@ class Event(models.Model):
     additional_links = models.TextField(blank=True)
     public = models.BooleanField(default=False,
                     help_text='Available to everyone (else MoCo only.)')
+    featured = models.BooleanField(default=False)
