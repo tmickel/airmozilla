@@ -1,6 +1,9 @@
+import datetime
+
 from django.shortcuts import render
 
 
-def home(request, template='main/home.html'):
+def page(request, template='main/home.html'):
     """Main view."""
-    return render(request, template)
+    current_date = datetime.datetime.utcnow()
+    return render(request, template, {'current_date': current_date})

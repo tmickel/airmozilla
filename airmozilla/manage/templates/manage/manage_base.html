@@ -3,6 +3,7 @@
 {% set navigation_bar = [
     ('', 'Management Tools', '', '', True),
     (url('manage:home'), 'Welcome', 'home', 'icon-home', True),
+    (url('main:home'), 'Air Mozilla Index', '', 'icon-th-list', True),
     (url('auth:logout'), 'Log Out', '', 'icon-off', True),
 
     ('', 'Users and groups', '', '', perms.change_user),
