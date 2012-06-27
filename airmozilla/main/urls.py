@@ -4,7 +4,7 @@ from . import views
 
 
 urlpatterns = patterns('',
-    url(r'^$', views.page, name='home'),
+    url(r'^$', views.home, name='home'),
     url(r'^login/$', views.page, name='login',
         kwargs={'template': 'main/login.html'}),
     url(r'^login-failure/$', views.page, name='login_failure',
