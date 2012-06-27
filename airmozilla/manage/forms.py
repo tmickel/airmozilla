@@ -4,7 +4,10 @@ from django.contrib.auth.models import User, Group
 from funfactory.urlresolvers import reverse
 
 from airmozilla.base.forms import BaseModelForm
+from airmozilla.base.utils import unique_slugify
 from airmozilla.main.models import Category, Event, Participant, Tag
+
+
 
 
 class UserEditForm(BaseModelForm):
@@ -71,6 +74,13 @@ class EventRequestForm(BaseModelForm):
             p = Participant.objects.get(name=participant_name)
             final_participants.append(p)
         return final_participants
+    
+    def clean_slug(self):
+        if not self.cleaned_data['slug']:
+            self.cleaned_data['slug'] = unique_slugify(
+                                        self.cleaned_data['title'], 
+                                        Event)
+        return self.cleaned_data['slug'] 
 
     class Meta:
         model = Event
@@ -83,6 +93,12 @@ class EventRequestForm(BaseModelForm):
 
 
 class ParticipantEditForm(BaseModelForm):
+    def clean_slug(self):
+        if not self.cleaned_data['slug']:
+            self.cleaned_data['slug'] = unique_slugify(
+                                        self.cleaned_data['name'], 
+                                        Participant)
+        return self.cleaned_data['slug'] 
     class Meta:
         model = Participant
 

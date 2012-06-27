@@ -16,6 +16,7 @@ def _upload_path(instance, filename):
 class Participant(models.Model):
     """ Participants - speakers at events. """
     name = models.CharField(max_length=50)
+    slug = models.SlugField(blank=True)
     photo = models.FileField(upload_to=_upload_path, blank=True)
     email = models.EmailField(blank=True)
     department = models.CharField(max_length=50, blank=True)
@@ -61,6 +62,7 @@ class Tag(models.Model):
 class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
+    slug = models.SlugField(blank=True)
     video_url = models.URLField(blank=True)
     STATUS_CHOICES = (
         ('I', 'Initiated'),
