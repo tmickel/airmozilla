@@ -1,6 +1,10 @@
 {% extends 'main/main_base.html' %}
 {% set page='about' %}
 
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
 {% block content_main %}
     <h2 class="section-title">About</h2>
     <article>

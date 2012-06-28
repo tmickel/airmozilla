@@ -1,27 +1,54 @@
 {% extends 'main/main_base.html' %}
 
+{% block banner %}
+    {% if events.number == 1 %}
+        {% include 'main/_banner_large.html' %}
+    {% else %}
+        {% include 'main/_banner_small.html' %}
+    {% endif %}
+{% endblock %}
+
 {% block content_main %}
     <h2 class="section-title">
         {{ _('Recent Videos') }}
     </h2>
     {% for event in events %}
+        {% set href = url('main:event', slug=event.slug) %}
         <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
             <header class="entry-header">
                 <h2 class="entry-title">
-                    <a href="#">{{ event.title }}</a>
+                    <a href="{{ href }}">{{ event.title }}</a>
                 </h2>
             </header>
             <div class="entry-summary">
                 <p class="event-date">{{ event.start_time|js_date }}</p>
-                <a href="#">
+                <a href="{{ href }}">
                     <img src="{{ event.placeholder_img.url }}" 
                     width="68" height="68" 
                     class="attachment-68x68 wp-post-image">
                 </a>
                 <p>{{ event.description }}
-                    <a class="go" href="#">{{ _('See more') }}</a>
+                    <a class="go" href="{{ href }}">{{ _('See more') }}</a>
                 </p>
             </div> 
         </article>
     {% endfor %}
+    <nav class="nav-paging">
+        <ul role="navigation">
+        {% if events.has_next() %}
+        <li class="prev">
+            <a href="{{ url('main:home', events.next_page_number()) }}">
+                {{ _('Older videos') }}
+            </a>
+        </li>
+        {% endif %}
+        {% if events.has_previous() %}
+        <li class="next">
+            <a href="{{ url('main:home', events.previous_page_number()) }}">
+                {{ _('Newer videos') }}
+            </a>
+        </li>
+        {% endif %}
+        </ul>
+    </nav>
 {% endblock %}

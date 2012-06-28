@@ -1,8 +1,12 @@
 {% extends 'main/main_base.html' %}
 {% set page='login' %}
 
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
 {% block content_main %}
-<p>
-    {{ _('Sorry, only Mozilla employees can log in to Air Mozilla.') }}
-</p>
+    <p>
+        {{ _('Sorry, only Mozilla employees can log in to Air Mozilla.') }}
+    </p>
 {% endblock %}

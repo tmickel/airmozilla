@@ -62,7 +62,7 @@ class Tag(models.Model):
 class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, max_length=200)
     video_url = models.URLField(blank=True)
     STATUS_CHOICES = (
         ('I', 'Initiated'),
@@ -70,7 +70,7 @@ class Event(models.Model):
     )
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, 
                               default='I')
-    placeholder_img = models.FileField(upload_to=_upload_path, blank=True)
+    placeholder_img = models.FileField(upload_to=_upload_path)
     description = models.TextField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(
