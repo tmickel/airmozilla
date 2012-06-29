@@ -59,14 +59,51 @@ Air Mozilla | Mozilla, in Video
       </aside>
       {% block also_live %}{% endblock %}
       {% if featured %}
-      {% include 'main/_features.html' %}
+        <aside id="also-featured" class="widget more-posts hfeed">
+        <h3 class="widget-title">{{ _('Featured Videos') }}</h3>
+        <ul>
+          {% for feature in featured %}
+            <li class="hentry featured">
+              <h4 class="entry-title">
+                <a href="{{ url('main:event', slug=feature.slug) }}">
+                  <span class="video-thumb">
+                    <img width="160" height="160"
+                         src="{{ feature.placeholder_img.url }}"
+                         class="attachment-160x160 wp-post-image">
+                  </span>
+                  {{ feature.title }}
+                </a>
+              </h4>
+              <p class="event-date">{{ feature.start_time|js_date }}</p>
+              <p class="entry-summary">{{ feature.description }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+        </aside>
       {% endif %}
     </div>
   </div>
 
   </div>
   </div>
-  {% include 'main/_footer.html' %}
+<footer id="site-info" role="contentinfo">
+  <div class="wrap">
+    <p id="foot-logo">
+      <a class="top" href="#page">{{ _('Return to top') }}</a>
+      <a class="logo" href="//mozilla.org" rel="external">Mozilla</a>
+    </p>
+    <p id="colophon">
+      Except where otherwise <a href="//www.mozilla.org/en-US/about/legal.html#site" rel="external">noted</a>, content on this site is licensed under the <a href="http://creativecommons.org/licenses/by-sa/3.0/" rel="external license">Creative Commons Attribution Share-Alike License v3.0</a> or any later version.</p>
+    <nav id="nav-meta">
+      <ul role="navigation">
+        <li><a href="//www.mozilla.org/contact/" rel="external">{{ _('Contact Us') }}</a></li>
+        <li><a href="//www.mozilla.org/en-US/privacy" rel="external">{{ _('Privacy Policy') }}</a></li>
+        <li><a href="//www.mozilla.org/en-US/about/legal.html" rel="external">{{ _('Legal Notices') }}</a></li>
+        <li><a href="//www.mozilla.org/en-US/legal/fraud-report/index.html" rel="external">{{ _('Report Trademark Abuse') }}</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
 {% endblock %}
 
 {% block site_js %}
