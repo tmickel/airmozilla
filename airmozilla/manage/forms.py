@@ -73,13 +73,6 @@ class EventRequestForm(BaseModelForm):
             final_participants.append(p)
         return final_participants
 
-    def clean_slug(self):
-        if not self.cleaned_data['slug']:
-            self.cleaned_data['slug'] = unique_slugify(
-                                        self.cleaned_data['title'],
-                                        Event)
-        return self.cleaned_data['slug']
-
     class Meta:
         model = Event
         widgets = {
@@ -91,13 +84,6 @@ class EventRequestForm(BaseModelForm):
 
 
 class ParticipantEditForm(BaseModelForm):
-    def clean_slug(self):
-        if not self.cleaned_data['slug']:
-            self.cleaned_data['slug'] = unique_slugify(
-                                        self.cleaned_data['name'],
-                                        Participant)
-        return self.cleaned_data['slug']
-
     class Meta:
         model = Participant
 
