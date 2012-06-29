@@ -37,10 +37,10 @@ def home(request, page=1):
     except EmptyPage:
         past_events_paged = paginate.page(paginate.num_pages)
     live = False
+    also_live = []
     if live_events:
         live = live_events[0]
         also_live = live_events[1:]
-        print live_events
     return render(request, 'main/home.html', {
         'events': past_events_paged,
         'featured': featured,
