@@ -1,12 +1,12 @@
 from django.conf.urls.defaults import *
-from django.views.generic.simple import redirect_to
+from django.views.generic.base import RedirectView
 
 from . import views
 
 
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
-    url(r'^page/1/$', redirect_to, {'url': '/'}),
+    url(r'^page/1/$', RedirectView.as_view(url='/'), name='first_page'),
     url(r'^page/(?P<page>\d+)/$', views.home, name='home'),
     url(r'^presenter/(?P<slug>[-\w]+)/$', views.participant, 
                                           name='participant'),

@@ -68,7 +68,7 @@ class Event(models.Model):
         ('I', 'Initiated'),
         ('S', 'Scheduled')
     )
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, 
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES,
                               default='I')
     placeholder_img = models.FileField(upload_to=_upload_path)
     description = models.TextField()

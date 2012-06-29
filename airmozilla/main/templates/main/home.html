@@ -35,14 +35,14 @@
             <div class="entry-summary">
                 <p class="event-date">{{ event.start_time|js_date }}</p>
                 <a href="{{ href }}">
-                    <img src="{{ event.placeholder_img.url }}" 
-                    width="68" height="68" 
+                    <img src="{{ event.placeholder_img.url }}"
+                    width="68" height="68"
                     class="attachment-68x68 wp-post-image">
                 </a>
                 <p>{{ short_desc(event) }}
                     <a class="go" href="{{ href }}">{{ _('See more') }}</a>
                 </p>
-            </div> 
+            </div>
         </article>
     {% endfor %}
     <nav class="nav-paging">

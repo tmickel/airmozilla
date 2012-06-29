@@ -4,6 +4,7 @@ import json
 from django import http
 from django.template.defaultfilters import slugify
 
+
 def unique_slugify(data, model):
     slug_base = slugify(data)
     counter = 0
@@ -14,6 +15,7 @@ def unique_slugify(data, model):
         slug = "%s-%i" % (slug_base, counter)
         duplicate = model.objects.filter(slug__iexact=slug)
     return slug
+
 
 # From socorro-crashstats
 def json_view(f):

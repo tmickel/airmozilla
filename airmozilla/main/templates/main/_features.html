@@ -4,7 +4,7 @@
     {% for feature in featured %}
         <li class="hentry featured">
             <h4 class="entry-title">
-                <a href="{{ url('main:event', slug=feature.slug) }}"> 
+                <a href="{{ url('main:event', slug=feature.slug) }}">
                     <span class="video-thumb">
                         <img width="160" height="160"
                              src="{{ feature.placeholder_img.url }}"

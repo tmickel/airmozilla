@@ -8,8 +8,6 @@ from airmozilla.base.utils import unique_slugify
 from airmozilla.main.models import Category, Event, Participant, Tag
 
 
-
-
 class UserEditForm(BaseModelForm):
     class Meta:
         model = User
@@ -74,13 +72,13 @@ class EventRequestForm(BaseModelForm):
             p = Participant.objects.get(name=participant_name)
             final_participants.append(p)
         return final_participants
-    
+
     def clean_slug(self):
         if not self.cleaned_data['slug']:
             self.cleaned_data['slug'] = unique_slugify(
-                                        self.cleaned_data['title'], 
+                                        self.cleaned_data['title'],
                                         Event)
-        return self.cleaned_data['slug'] 
+        return self.cleaned_data['slug']
 
     class Meta:
         model = Event
@@ -96,9 +94,10 @@ class ParticipantEditForm(BaseModelForm):
     def clean_slug(self):
         if not self.cleaned_data['slug']:
             self.cleaned_data['slug'] = unique_slugify(
-                                        self.cleaned_data['name'], 
+                                        self.cleaned_data['name'],
                                         Participant)
-        return self.cleaned_data['slug'] 
+        return self.cleaned_data['slug']
+
     class Meta:
         model = Participant
 

@@ -136,7 +136,7 @@ def participant_autocomplete(request):
     participants = Participant.objects.filter(name__icontains=query)
     # Only match names with a component which starts with the query
     regex = re.compile(r'\b%s' % re.escape(query.split()[0]), re.I)
-    participant_names = [{'id': p.name, 'text': p.name} 
+    participant_names = [{'id': p.name, 'text': p.name}
                          for p in participants if regex.findall(p.name)]
     return {'participants': participant_names[:5]}
 
