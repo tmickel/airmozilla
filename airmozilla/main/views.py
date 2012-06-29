@@ -17,8 +17,9 @@ def home(request, page=1):
     """Paginated recent videos and live videos."""
     featured = Event.objects.filter(public=True, featured=True)
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
-    past_filter = {'end_time__lt': now, 'status': 'S'}
-    live_filter = {'end_time__gt': now, 'start_time__lt': now, 'status': 'S'}
+    past_filter = {'end_time__lt': now, 'status': Event.STATUS_SCHEDULED}
+    live_filter = {'end_time__gt': now, 'start_time__lt': now, 
+                   'status': Event.STATUS_SCHEDULED}
     if not request.user.is_active:
         past_filter['public'] = True
         live_filter['public'] = True
@@ -48,7 +49,7 @@ def event(request, slug):
     """Video, description, and other metadata."""
     featured = Event.objects.filter(public=True, featured=True)
     event = get_object_or_404(Event, slug=slug)
-    if ((not event.public or event.status == 'I')
+    if ((not event.public or event.status == Event.STATUS_INITIATED)
         and not request.user.is_active):
         return redirect('main:login')
     return render(request, 'main/event.html', {
@@ -61,7 +62,7 @@ def participant(request, slug):
     """Individual participant/speaker profile."""
     participant = get_object_or_404(Participant, slug=slug)
     featured = Event.objects.filter(public=True, featured=True)
-    if participant.cleared != 'Y':
+    if participant.cleared != Participant.CLEARED_YES:
         return redirect('main:login')
     return render(request, 'main/participant.html', {
         'participant': participant,

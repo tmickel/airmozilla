@@ -16,7 +16,7 @@ def _upload_path(instance, filename):
 class Participant(models.Model):
     """ Participants - speakers at events. """
     name = models.CharField(max_length=50)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, max_length=65)
     photo = models.FileField(upload_to=_upload_path, blank=True)
     email = models.EmailField(blank=True)
     department = models.CharField(max_length=50, blank=True)
@@ -25,19 +25,25 @@ class Participant(models.Model):
     topic_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
     twitter = models.CharField(max_length=50, blank=True)
+    ROLE_EVENT_COORDINATOR = 'event-coordinator'
+    ROLE_PRINCIPAL_PRESENTER = 'principal-presenter'
+    ROLE_PRESENTER = 'presenter'
     ROLE_CHOICES = (
-        ('C', 'Event Coordinator'),
-        ('PP', 'Principal Presenter'),
-        ('P', 'Presenter'),
+        (ROLE_EVENT_COORDINATOR, 'Event Coordinator'),
+        (ROLE_PRINCIPAL_PRESENTER, 'Principal Presenter'),
+        (ROLE_PRESENTER, 'Presenter'),
     )
-    role = models.CharField(max_length=2, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=25, choices=ROLE_CHOICES)
+    CLEARED_YES = 'yes'
+    CLEARED_NO = 'no'
+    CLEARED_FINAL_CUT = 'final-cut'
     CLEARED_CHOICES = (
-        ('Y', 'Yes'),
-        ('N', 'No'),
-        ('F', 'Final Cut'),
+        (CLEARED_YES, 'Yes'),
+        (CLEARED_NO, 'No'),
+        (CLEARED_FINAL_CUT, 'Final Cut'),
     )
-    cleared = models.CharField(max_length=2,
-                               choices=CLEARED_CHOICES, default='N')
+    cleared = models.CharField(max_length=15,
+                               choices=CLEARED_CHOICES, default=CLEARED_NO)
 
     def __unicode__(self):
         return self.name
@@ -62,14 +68,16 @@ class Tag(models.Model):
 class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
-    slug = models.SlugField(blank=True, max_length=200)
+    slug = models.SlugField(blank=True, max_length=215)
     video_url = models.URLField(blank=True)
+    STATUS_INITIATED = 'initiated'
+    STATUS_SCHEDULED = 'scheduled'
     STATUS_CHOICES = (
-        ('I', 'Initiated'),
-        ('S', 'Scheduled')
+        (STATUS_INITIATED, 'Initiated'),
+        (STATUS_SCHEDULED, 'Scheduled')
     )
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES,
-                              default='I')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES,
+                              default=STATUS_INITIATED)
     placeholder_img = models.FileField(upload_to=_upload_path)
     description = models.TextField()
     start_time = models.DateTimeField()
