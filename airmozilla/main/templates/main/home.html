@@ -1,17 +1,29 @@
 {% extends 'main/main_base.html' %}
+{% set front_page = (events.number == 1) %}
 
 {% block banner %}
-    {% if events.number == 1 %}
+    {% if front_page %}
         {% include 'main/_banner_large.html' %}
     {% else %}
         {% include 'main/_banner_small.html' %}
     {% endif %}
 {% endblock %}
 
+{% block also_live %}
+    {% if also_live %}
+        {% include 'main/_also_live.html' %}
+    {% endif %}
+{% endblock %}
+
 {% block content_main %}
-    <h2 class="section-title">
-        {{ _('Recent Videos') }}
-    </h2>
+    {% if front_page %}
+        {% if live %}
+            {% include 'main/_live_now.html' %}
+        {% endif %}
+        <h2 class="section-title">
+            {{ _('Recent Videos') }}
+        </h2>
+    {% endif %}
     {% for event in events %}
         {% set href = url('main:event', slug=event.slug) %}
         <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
@@ -27,7 +39,7 @@
                     width="68" height="68" 
                     class="attachment-68x68 wp-post-image">
                 </a>
-                <p>{{ event.description }}
+                <p>{{ short_desc(event) }}
                     <a class="go" href="{{ href }}">{{ _('See more') }}</a>
                 </p>
             </div> 

@@ -1,6 +1,8 @@
 import datetime
 import jinja2
 
+from django.utils.text import truncate_words
+
 from jingo import register
 
 
@@ -18,4 +20,13 @@ def js_date(dt, format='ddd, MMM D, YYYY, h:mma UTCZZ'):
 
 @register.function
 def date_now():
+    """The current date in UTC."""
     return datetime.datetime.utcnow()
+
+
+@register.function
+def short_desc(event, words=25):
+    """Takes an event object and returns a shortened description."""
+    # We use an event object instead of a description itself
+    # so in the future, we could use a human-shortened version if provided.
+    return truncate_words(event.description, words)

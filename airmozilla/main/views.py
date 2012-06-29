@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -11,40 +13,62 @@ def page(request, template):
 
 
 def home(request, page=1):
-    """Home renders paginated recent videos."""
+    """Paginated recent videos and live videos."""
     featured = Event.objects.filter(public=True, featured=True)
+    now = datetime.datetime.utcnow()
     if request.user.is_active:
-        events = Event.objects.filter().order_by('-end_time')
+        past_events = (Event.objects.filter(end_time__lt=now, status='S')
+                           .order_by('-end_time'))
+        live_events = (Event.objects.filter(end_time__gt=now, 
+                            start_time__lt=now, status='S')
+                            .order_by('-end_time'))
     else:
-        events = Event.objects.filter(public=True).order_by('-end_time')
-    paginate = Paginator(events, 10)
+        past_events = (Event.objects.filter(public=True, end_time__lt=now,
+                            status='S')
+                           .order_by('-end_time'))
+        live_events = (Event.objects.filter(end_time__gt=now, 
+                            start_time__lt=now, status='S', public=True)
+                            .order_by('-end_time'))
+    paginate = Paginator(past_events, 10)
     try:
-        events_paged = paginate.page(page)
+        past_events_paged = paginate.page(page)
     except PageNotAnInteger:
-        events_paged = paginate.page(1)
+        past_events_paged = paginate.page(1)
     except EmptyPage:
-        events_paged = paginate.page(paginate.num_pages)
-    return render(request, 'main/home.html', {'events': events_paged,
-                                              'featured': featured})
+        past_events_paged = paginate.page(paginate.num_pages)
+    live = False
+    if live_events:
+        live = live_events[0]
+        also_live = live_events[1:]
+        print live_events
+    return render(request, 'main/home.html', {
+        'events': past_events_paged,
+        'featured': featured,
+        'live': live,
+        'also_live': also_live
+    })
 
 
 def event(request, slug):
-    """Event video view page."""
+    """Video, description, and other metadata."""
     featured = Event.objects.filter(public=True, featured=True)
     event = get_object_or_404(Event, slug=slug)
-
-    if not event.public and not request.user.is_active:
+    if ((not event.public or event.status == 'I') 
+        and not request.user.is_active):
         return redirect('main:login')
-
-    return render(request, 'main/event.html', {'event': event, 
-                                               'featured': featured})
+    return render(request, 'main/event.html', {
+        'event': event, 
+        'featured': featured,
+    })
 
 
 def participant(request, slug):
-    """View an individual participant/speaker profile."""
+    """Individual participant/speaker profile."""
     participant = get_object_or_404(Participant, slug=slug)
     featured = Event.objects.filter(public=True, featured=True)
     if participant.cleared != 'Y':
         return redirect('main:login')
-    return render(request, 'main/participant.html', 
-                           {'participant': participant, 'featured': featured})
+    return render(request, 'main/participant.html', {
+        'participant': participant,
+        'featured': featured
+    })

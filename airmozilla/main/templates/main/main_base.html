@@ -57,6 +57,7 @@ Air Mozilla | Mozilla, in Video
                 {{ date_now()|js_date }}
             </p>
           </aside>
+          {% block also_live %}{% endblock %}
           {% if featured %}
             {% include 'main/_features.html' %}  
           {% endif %}

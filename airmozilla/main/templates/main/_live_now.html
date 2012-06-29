@@ -1,0 +1,23 @@
+{% set href=url('main:event', live.slug) %}
+<article id="feature-{{ live.id }}" class="tag-live main-feature">
+  <header>
+    <hgroup>
+          <h2 class="feature-type">{{ _('Streaming Live Now') }}</h2>
+          <h3 class="entry-title">
+            <a href="{{ href }}" rel="bookmark">{{ live.title }}</a>
+          </h3>
+    </hgroup>
+        <p class="event-date">{{ _('Started') }} {{ live.start_time|js_date }}</p>
+      </header>
+	<div class="entry-summary">
+    <a href="{{ href }}">
+          <img src="{{ live.placeholder_img.url }}" alt="" width="160" 
+               height="160" class="wp-post-image">
+    		</a>
+		<p>{{ short_desc(live, 10) }}
+            <a class="go" href="{{ href }}">{{_('See more') }}</a></p>
+		<p class="watch"><a class="button" href="{{ href }}">
+        {{ _('Watch Now') }}
+        </a></p>
+	</div>
+</article>
