@@ -13,66 +13,66 @@ Air Mozilla | Mozilla, in Video
 {% endblock %}
 
 {% block site_css %}
-    {% compress css %}
-        <link href="{{ static('main/css/main.css')}}" rel="stylesheet" type="text/css">
-    {% endcompress %}
-    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet">
+  {% compress css %}
+    <link href="{{ static('main/css/main.css')}}" rel="stylesheet" type="text/css">
+  {% endcompress %}
+  <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-    <div id="page">
-    <div class="wrap">
-    <header id="masthead">
-        <nav id="nav-main" role="navigation">
-            <ul>
-                {% for title, view, id, show in nav_main %}
-                    {% if show %}
-                    <li>
-                        <a href="{{ url(view) }}"
-                            {% if id == page %} class="current"{% endif %}>
-                        {{ title }}
-                        </a>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </nav>
-        <hgroup>
-        {% block banner %}
-            {% include 'main/_banner_large.html' %}
-        {% endblock %}
-        </hgroup>
-        <a href="//www.mozilla.org/" id="tabzilla">mozilla</a>
-    </header>
-
-    <div id="content">
-        <div id="content-main" class="main" role="main">
-            {% block content_main %}{% endblock %}
-        </div>
-        <div id="content-sub" class="sub sidebar widgets" role="complementary">
-          <aside id="current-time" class="widget">
-            <h3 class="widget-title">{{ _('Current Time') }}</h3>
-            <p class="datetime">
-                {{ date_now()|js_date }}
-            </p>
-          </aside>
-          {% block also_live %}{% endblock %}
-          {% if featured %}
-            {% include 'main/_features.html' %}
+  <div id="page">
+  <div class="wrap">
+  <header id="masthead">
+    <nav id="nav-main" role="navigation">
+      <ul>
+        {% for title, view, id, show in nav_main %}
+          {% if show %}
+          <li>
+            <a href="{{ url(view) }}"
+              {% if id == page %} class="current"{% endif %}>
+            {{ title }}
+            </a>
+          </li>
           {% endif %}
-        </div>
-    </div>
+        {% endfor %}
+      </ul>
+    </nav>
+    <hgroup>
+    {% block banner %}
+      {% include 'main/_banner_large.html' %}
+    {% endblock %}
+    </hgroup>
+    <a href="//www.mozilla.org/" id="tabzilla">mozilla</a>
+  </header>
 
+  <div id="content">
+    <div id="content-main" class="main" role="main">
+      {% block content_main %}{% endblock %}
     </div>
+    <div id="content-sub" class="sub sidebar widgets" role="complementary">
+      <aside id="current-time" class="widget">
+      <h3 class="widget-title">{{ _('Current Time') }}</h3>
+      <p class="datetime">
+        {{ date_now()|js_date }}
+      </p>
+      </aside>
+      {% block also_live %}{% endblock %}
+      {% if featured %}
+      {% include 'main/_features.html' %}
+      {% endif %}
     </div>
-    {% include 'main/_footer.html' %}
+  </div>
+
+  </div>
+  </div>
+  {% include 'main/_footer.html' %}
 {% endblock %}
 
 {% block site_js %}
-    {{ super() }}
-    {% compress js %}
-        <script src="{{ static('js/libs/moment.min.js') }}"></script>
-        <script src="{{ static('main/js/timezone.js') }}"></script>
-    {% endcompress %}
-    <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
+  {{ super() }}
+  {% compress js %}
+    <script src="{{ static('js/libs/moment.min.js') }}"></script>
+    <script src="{{ static('main/js/timezone.js') }}"></script>
+  {% endcompress %}
+  <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
 {% endblock %}
