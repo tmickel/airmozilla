@@ -12,7 +12,7 @@
                 {{ live.title }}
                 </a>
             </h4>
-            <p class="event-date">Started {{ live.start_time|js_date }}</p>
+            <p class="event-date">{{ _('Started') }} {{ live.start_time|js_date }}</p>
             <p class="entry-summary">{{ short_desc(live) }}</p>
         </li>
         {% endfor %}
