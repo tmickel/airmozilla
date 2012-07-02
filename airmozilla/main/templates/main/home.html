@@ -19,7 +19,7 @@
           <h4 class="entry-title">
             <a href="{{ url('main:event', live.slug) }}">
               <span class="video-thumb">
-                <img src="{{ live.placeholder_img.url }}" alt=""
+                <img src="{{ live.placeholder_img.url }}" alt="{{ live.title }}"
                      width="160" height="160" class="wp-post-image">
               </span>
               {{ live.title }}
@@ -50,7 +50,7 @@
       </header>
       <div class="entry-summary">
         <a href="{{ href }}">
-          <img src="{{ live.placeholder_img.url }}" alt="" width="160"
+          <img src="{{ live.placeholder_img.url }}" alt="{{ live.title }}" width="160"
                height="160" class="wp-post-image">
         </a>
         <p>{{ short_desc(live, 10) }}
@@ -77,7 +77,7 @@
         <p class="event-date">{{ event.start_time|js_date }}</p>
         <a href="{{ href }}">
           <img src="{{ event.placeholder_img.url }}"
-               width="68" height="68"
+               width="68" height="68" alt="{{ event.title }}"
                class="attachment-68x68 wp-post-image">
         </a>
         <p>
