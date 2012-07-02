@@ -2,6 +2,7 @@ import datetime
 import jinja2
 
 from django.utils.text import truncate_words
+from django.utils.timezone import utc
 
 from jingo import register
 
@@ -13,15 +14,15 @@ def js_date(dt, format='ddd, MMM D, YYYY, h:mma UTCZZ'):
     dt_time = dt.strftime('%H:%M')
     dt_tz = dt.tzname() or 'UTC'
     formatted_datetime = ' '.join([dt_date, dt_time, dt_tz])
-    return jinja2.Markup('<time datetime="%s" class="jstime" \
-                           data-format="%s">%s</time>'
-                 % (formatted_datetime, format, formatted_datetime))
+    return jinja2.Markup('<time datetime="%s" class="jstime"'
+                          'data-format="%s">%s</time>'
+                 % (dt.isoformat(), format, formatted_datetime))
 
 
 @register.function
 def date_now():
     """The current date in UTC."""
-    return datetime.datetime.utcnow()
+    return datetime.datetime.utcnow().replace(tzinfo=utc, microsecond=0)
 
 
 @register.function
