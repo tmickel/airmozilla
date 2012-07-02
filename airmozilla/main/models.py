@@ -5,19 +5,23 @@ import os
 from django.db import models
 
 
-def _upload_path(instance, filename):
-    now = datetime.datetime.now()
-    path = now.strftime('%Y/%m/%d/')
-    hashed_filename = hashlib.md5(filename + str(now.microsecond)).hexdigest()
-    __, extension = os.path.splitext(filename)
-    return path + hashed_filename + extension
+def _upload_path(tag):
+    def _upload_path_tagged(instance, filename):
+        now = datetime.datetime.now()
+        path = now.strftime('%Y/%m/%d/')
+        hashed_filename = (hashlib.md5(filename + 
+                            str(now.microsecond)).hexdigest())
+        __, extension = os.path.splitext(filename)
+        return tag + '/' + path + hashed_filename + extension
+    return _upload_path_tagged
 
 
 class Participant(models.Model):
     """ Participants - speakers at events. """
     name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, max_length=65)
-    photo = models.FileField(upload_to=_upload_path, blank=True)
+    photo = models.FileField(upload_to=_upload_path('participant-photo'), 
+                             blank=True)
     email = models.EmailField(blank=True)
     department = models.CharField(max_length=50, blank=True)
     team = models.CharField(max_length=50, blank=True)
@@ -78,7 +82,8 @@ class Event(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,
                               default=STATUS_INITIATED)
-    placeholder_img = models.FileField(upload_to=_upload_path)
+    placeholder_img = models.FileField(upload_to=
+                                      _upload_path('event-placeholder'))
     description = models.TextField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(

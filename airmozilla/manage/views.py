@@ -111,8 +111,8 @@ def event_request(request):
             if not event.slug:
                 event.slug = unique_slugify(event.title, Event, 
                     event.start_time.strftime('%Y%m%d'))
-                event.save()
-                form.save_m2m()
+            event.save()
+            form.save_m2m()
             return redirect('manage:home')
     else:
         form = EventRequestForm()
@@ -185,7 +185,7 @@ def participant_edit(request, id):
             if not participant.slug:
                 participant.slug = unique_slugify(participant.name, 
                                                   Participant)
-                participant.save()
+            participant.save()
             return redirect('manage:participants')
     else:
         form = ParticipantEditForm(instance=participant)
@@ -204,7 +204,7 @@ def participant_new(request):
             if not participant.slug:
                 participant.slug = unique_slugify(participant.name, 
                                                   Participant)
-                participant.save()
+            participant.save()
             return redirect('manage:participants')
     else:
         form = ParticipantEditForm()
