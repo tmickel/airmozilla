@@ -282,6 +282,7 @@ class TestParticipants(TestCase):
             response_ok = self.client.post(reverse('manage:participant_new'),
                 {
                     'name': 'Mozilla Firefox',
+                    'slug': 'mozilla-firefox',
                     'photo': fp,
                     'email': 'mozilla@mozilla.com',
                     'role': Participant.ROLE_PRINCIPAL_PRESENTER,
