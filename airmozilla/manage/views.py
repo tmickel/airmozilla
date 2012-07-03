@@ -105,69 +105,22 @@ def group_new(request):
 
 
 @staff_required
-@permission_required('change_participant')
-def participants(request):
-    """Participants page:  view and search participants/speakers. """
+@permission_required('add_event')
+def event_request(request):
+    """Event request page:  create new events to be published."""
     if request.method == 'POST':
-        search_form = ParticipantFindForm(request.POST)
-        if search_form.is_valid():
-            participants = Participant.objects.filter(name__icontains=
-                                       search_form.cleaned_data['name'])
-        else:
-            participants = Participant.objects.all()
-    else:
-        participants = Participant.objects.all()
-        search_form = ParticipantFindForm()
-    paginator = Paginator(participants, 10)
-    page = request.GET.get('page')
-    try:
-        participants_paged = paginator.page(page)
-    except PageNotAnInteger:
-        participants_paged = paginator.page(1)
-    except EmptyPage:
-        participants_paged = paginator.page(paginator.num_pages)
-    return render(request, 'manage/participants.html',
-                  {'paginate': participants_paged, 'form': search_form})
-
-
-@staff_required
-@permission_required('changed_participant')
-def participant_edit(request, id):
-    """ Participant edit page:  update biographical info. """
-    participant = Participant.objects.get(id=id)
-    if request.method == 'POST':
-        form = ParticipantEditForm(request.POST, request.FILES,
-                                   instance=participant)
+        form = EventRequestForm(request.POST, request.FILES, instance=Event())
         if form.is_valid():
-            participant = form.save(commit=False)
-            if not participant.slug:
-                participant.slug = unique_slugify(participant.name,
-                                                  [Participant])
-            participant.save()
-            return redirect('manage:participants')
+            event = form.save(commit=False)
+            if not event.slug:
+                event.slug = unique_slugify(event.title, [Event, EventOldSlug],
+                    event.start_time.strftime('%Y%m%d'))
+            event.save()
+            form.save_m2m()
+            return redirect('manage:home')
     else:
-        form = ParticipantEditForm(instance=participant)
-    return render(request, 'manage/participant_edit.html',
-                  {'form': form, 'participant': participant})
-
-
-@staff_required
-@permission_required('add_participant')
-def participant_new(request):
-    if request.method == 'POST':
-        form = ParticipantEditForm(request.POST, request.FILES,
-                                   instance=Participant())
-        if form.is_valid():
-            participant = form.save(commit=False)
-            if not participant.slug:
-                participant.slug = unique_slugify(participant.name,
-                                                  [Participant])
-            participant.save()
-            return redirect('manage:participants')
-    else:
-        form = ParticipantEditForm()
-    return render(request, 'manage/participant_new.html',
-                  {'form': form})
+        form = EventRequestForm()
+    return render(request, 'manage/event_request.html', {'form': form})
 
 
 @staff_required
@@ -236,25 +189,6 @@ def event_edit(request, id):
 
 @staff_required
 @permission_required('add_event')
-def event_request(request):
-    """Event request page:  create new events to be published."""
-    if request.method == 'POST':
-        form = EventRequestForm(request.POST, request.FILES, instance=Event())
-        if form.is_valid():
-            event = form.save(commit=False)
-            if not event.slug:
-                event.slug = unique_slugify(event.title, [Event, EventOldSlug],
-                    event.start_time.strftime('%Y%m%d'))
-            event.save()
-            form.save_m2m()
-            return redirect('manage:home')
-    else:
-        form = EventRequestForm()
-    return render(request, 'manage/event_request.html', {'form': form})
-
-
-@staff_required
-@permission_required('add_event')
 @json_view
 def tag_autocomplete(request):
     """ Feeds JSON tag names to the Event Request form. """
@@ -278,6 +212,72 @@ def participant_autocomplete(request):
     participant_names = [{'id': p.name, 'text': p.name}
                          for p in participants if regex.findall(p.name)]
     return {'participants': participant_names[:5]}
+
+
+@staff_required
+@permission_required('change_participant')
+def participants(request):
+    """Participants page:  view and search participants/speakers. """
+    if request.method == 'POST':
+        search_form = ParticipantFindForm(request.POST)
+        if search_form.is_valid():
+            participants = Participant.objects.filter(name__icontains=
+                                       search_form.cleaned_data['name'])
+        else:
+            participants = Participant.objects.all()
+    else:
+        participants = Participant.objects.all()
+        search_form = ParticipantFindForm()
+    paginator = Paginator(participants, 10)
+    page = request.GET.get('page')
+    try:
+        participants_paged = paginator.page(page)
+    except PageNotAnInteger:
+        participants_paged = paginator.page(1)
+    except EmptyPage:
+        participants_paged = paginator.page(paginator.num_pages)
+    return render(request, 'manage/participants.html',
+                  {'paginate': participants_paged, 'form': search_form})
+
+
+@staff_required
+@permission_required('changed_participant')
+def participant_edit(request, id):
+    """ Participant edit page:  update biographical info. """
+    participant = Participant.objects.get(id=id)
+    if request.method == 'POST':
+        form = ParticipantEditForm(request.POST, request.FILES,
+                                   instance=participant)
+        if form.is_valid():
+            participant = form.save(commit=False)
+            if not participant.slug:
+                participant.slug = unique_slugify(participant.name,
+                                                  [Participant])
+            participant.save()
+            return redirect('manage:participants')
+    else:
+        form = ParticipantEditForm(instance=participant)
+    return render(request, 'manage/participant_edit.html',
+                  {'form': form, 'participant': participant})
+
+
+@staff_required
+@permission_required('add_participant')
+def participant_new(request):
+    if request.method == 'POST':
+        form = ParticipantEditForm(request.POST, request.FILES,
+                                   instance=Participant())
+        if form.is_valid():
+            participant = form.save(commit=False)
+            if not participant.slug:
+                participant.slug = unique_slugify(participant.name,
+                                                  [Participant])
+            participant.save()
+            return redirect('manage:participants')
+    else:
+        form = ParticipantEditForm()
+    return render(request, 'manage/participant_new.html',
+                  {'form': form})
 
 
 @staff_required
