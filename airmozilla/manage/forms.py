@@ -78,10 +78,14 @@ class EventRequestForm(BaseModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'call_info': forms.Textarea(attrs={'rows': 3}),
-            'additional_links': forms.Textarea(attrs={'rows': 3})
+            'additional_links': forms.Textarea(attrs={'rows': 3}),
         }
         exclude = ('featured', 'status')
 
+
+class EventEditForm(EventRequestForm):
+    def __init__(self, *args, **kwargs):
+        super(EventEditForm, self).__init__(*args, **kwargs)
 
 class ParticipantEditForm(BaseModelForm):
     class Meta:

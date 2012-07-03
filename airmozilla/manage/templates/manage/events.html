@@ -1,0 +1,52 @@
+{% extends "manage/manage_base.html" %}
+{% set page = "events" %}
+
+{% block manage_title %}
+  Event manager
+{% endblock %}
+
+{% macro event_table(name, events) -%}
+<h3>{{ name }}</h3>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Start time</th>
+      <th>End time</th>
+      <th>Category</th>
+      <th>Public</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+      <tr>
+        <td>{{ event.title }}</td>
+        <td>{{ event.start_time|js_date }}</td>
+        <td>{{ event.end_time|js_date }}</td>
+        <td>{{ event.category }}</td>
+        <td>{{ 'Yes' if event.public else 'No' }}</td>
+        <td>
+          <a href="{{ url('manage:event_edit', event.id) }}" class="btn">
+            <i class="icon-edit"></i> Edit
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% block manage_content %}
+  {{ event_table('Initiated events, need approval', initiated) }}
+  {{ event_table('Upcoming and current events', upcoming) }}
+  {{ event_table('Archived events', archived) }}
+{% endblock %}
+
+{% block site_js %}
+  {{ super() }}
+  {% compress js %}
+    <script src="{{ static('js/libs/moment.min.js') }}"></script>
+    <script src="{{ static('main/js/timezone.js') }}"></script>
+  {% endcompress %}
+{% endblock %}

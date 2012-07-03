@@ -12,6 +12,13 @@ $(function() {
             results: function (data, page) {
                 return {results: data.tags};
             }
+        },
+        initSelection : function (element) {
+            var data = [];
+            $(element.val().split(',')).each(function () {
+                data.push({id: this, text: this});
+            });
+            return data;
         }
     });
 
@@ -42,6 +49,13 @@ $(function() {
             results: function(data, page) {
                 return {results: data.participants};
             }
+        },
+        initSelection : function (element) {
+            var data = [];
+            $(element.val().split(',')).each(function () {
+                data.push({id: this, text: this});
+            });
+            return data;
         }
     });
 });

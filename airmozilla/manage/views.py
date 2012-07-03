@@ -1,3 +1,4 @@
+import datetime
 import re
 
 from django.contrib.auth.decorators import permission_required, \
@@ -5,13 +6,14 @@ from django.contrib.auth.decorators import permission_required, \
 from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
+from django.utils.timezone import utc
 
 from airmozilla.base.utils import json_view, unique_slugify
 from airmozilla.main.models import Category, Event, Participant, Tag
 from airmozilla.manage.forms import CategoryForm, GroupEditForm, \
-                                    EventRequestForm, ParticipantEditForm, \
-                                    ParticipantFindForm, UserEditForm, \
-                                    UserFindForm
+                                    EventEditForm, EventRequestForm, \
+                                    ParticipantEditForm, ParticipantFindForm, \
+                                    UserEditForm, UserFindForm
 
 staff_required = user_passes_test(lambda u: u.is_staff)
 
@@ -214,9 +216,36 @@ def participant_new(request):
 
 @staff_required
 @permission_required('change_event')
-def event_edit(request):
-    """Event edit/production:  change, approve, publish events."""
-    return render(request, 'manage/event_edit.html')
+def events(request):
+    """Event edit/production:  approve, change, and publish events."""
+    now = datetime.datetime.utcnow().replace(tzinfo=utc)
+    initiated = Event.objects.filter(status=Event.STATUS_INITIATED)
+    upcoming = Event.objects.filter(status=Event.STATUS_SCHEDULED, 
+                                    end_time__gt=now)
+    archived = Event.objects.filter(end_time__lt=now)
+    return render(request, 'manage/events.html', {
+        'initiated': initiated,
+        'upcoming': upcoming,
+        'archived': archived
+    })
+
+@staff_required
+@permission_required('change_event')
+def event_edit(request, id):
+    """Edit form for a particular event."""
+    event = Event.objects.get(id=id)
+    if request.method == 'POST':
+        form = EventEditForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:events')
+    else:
+        ptags = ','.join([str(p) for p in event.participants.all()])
+        tags = ','.join([str(t) for t in event.tags.all()])
+        form = EventEditForm(instance=event,
+                             initial={'participants': ptags, 'tags': tags})
+    return render(request, 'manage/event_edit.html', {'form': form,
+                                                      'event': event})
 
 
 @staff_required
