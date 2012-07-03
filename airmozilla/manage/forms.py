@@ -5,7 +5,8 @@ from funfactory.urlresolvers import reverse
 
 from airmozilla.base.forms import BaseModelForm
 from airmozilla.base.utils import unique_slugify
-from airmozilla.main.models import Category, Event, Participant, Tag
+from airmozilla.main.models import Category, Event, EventOldSlug, \
+                                   Participant, Tag
 
 
 class UserEditForm(BaseModelForm):
@@ -72,6 +73,15 @@ class EventRequestForm(BaseModelForm):
             p = Participant.objects.get(name=participant_name)
             final_participants.append(p)
         return final_participants
+
+    def clean_slug(self):
+        """Enforce unique slug across current slugs and old slugs."""
+        slug = self.cleaned_data['slug']
+        in_use = (Event.objects.filter(slug=slug) or 
+                  EventOldSlug.objects.filter(slug=slug))
+        if in_use and in_use[0].id != self.instance.id:
+            raise forms.ValidationError('This slug is already in use.')
+        return slug
 
     class Meta:
         model = Event

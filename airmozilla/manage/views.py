@@ -9,7 +9,8 @@ from django.shortcuts import render, redirect
 from django.utils.timezone import utc
 
 from airmozilla.base.utils import json_view, unique_slugify
-from airmozilla.main.models import Category, Event, Participant, Tag
+from airmozilla.main.models import Category, Event, EventOldSlug, \
+                                   Participant, Tag
 from airmozilla.manage.forms import CategoryForm, GroupEditForm, \
                                     EventEditForm, EventFindForm, \
                                     EventRequestForm, ParticipantEditForm, \
@@ -141,7 +142,7 @@ def participant_edit(request, id):
             participant = form.save(commit=False)
             if not participant.slug:
                 participant.slug = unique_slugify(participant.name, 
-                                                  Participant)
+                                                  [Participant])
             participant.save()
             return redirect('manage:participants')
     else:
@@ -160,7 +161,7 @@ def participant_new(request):
             participant = form.save(commit=False)
             if not participant.slug:
                 participant.slug = unique_slugify(participant.name, 
-                                                  Participant)
+                                                  [Participant])
             participant.save()
             return redirect('manage:participants')
     else:
@@ -209,13 +210,17 @@ def events(request):
 def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
+    old_slug = unicode(event.slug)
     if request.method == 'POST':
         form = EventEditForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
             event = form.save(commit=False)
-            if not event.slug:
-                event.slug = unique_slugify(event.title, Event, 
-                    event.start_time.strftime('%Y%m%d'))
+            if event.slug != old_slug:
+                if not event.slug:
+                    event.slug = unique_slugify(event.title, 
+                        [Event, EventOldSlug], 
+                        event.start_time.strftime('%Y%m%d'))
+                EventOldSlug.objects.create(slug=old_slug, event=event)
             event.save()
             form.save_m2m()
             return redirect('manage:events')
@@ -237,7 +242,7 @@ def event_request(request):
         if form.is_valid():
             event = form.save(commit=False)
             if not event.slug:
-                event.slug = unique_slugify(event.title, Event, 
+                event.slug = unique_slugify(event.title, [Event, EventOldSlug],
                     event.start_time.strftime('%Y%m%d'))
             event.save()
             form.save_m2m()
