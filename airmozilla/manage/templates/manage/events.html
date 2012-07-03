@@ -65,8 +65,12 @@
     {{ event_table('Search results', search_results) }}
   {% else %}
     {% if paginate.number == 1 %}
-      {{ event_table('Initiated events, need approval', initiated, True) }}
-      {{ event_table('Upcoming and current events', upcoming) }}
+      {% if initiated %}
+        {{ event_table('Initiated events, need approval', initiated, True) }}
+      {% endif %}
+      {% if upcoming %}
+        {{ event_table('Upcoming and current events', upcoming) }}
+      {% endif %}
     {% endif %}
     {{ event_table('Archived events', paginate) }}
     {% include 'manage/_paginate.html' %}
