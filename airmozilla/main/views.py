@@ -18,7 +18,7 @@ def home(request, page=1):
     featured = Event.objects.filter(public=True, featured=True)
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
     past_filter = {'end_time__lt': now, 'status': Event.STATUS_SCHEDULED}
-    live_filter = {'end_time__gt': now, 'start_time__lt': now, 
+    live_filter = {'end_time__gt': now, 'start_time__lt': now,
                    'status': Event.STATUS_SCHEDULED}
     if not request.user.is_active:
         past_filter['public'] = True

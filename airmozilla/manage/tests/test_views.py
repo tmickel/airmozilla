@@ -224,7 +224,7 @@ class TestParticipants(TestCase):
         """Participants pagination always returns valid pages."""
         response = self.client.get(reverse('manage:participants'))
         eq_(response.status_code, 200)
-        response = self.client.get(reverse('manage:participants'), 
+        response = self.client.get(reverse('manage:participants'),
                                    {'page': 5000})
         eq_(response.status_code, 200)
 

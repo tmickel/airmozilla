@@ -21,7 +21,7 @@ class Participant(models.Model):
     """ Participants - speakers at events. """
     name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, max_length=65, unique=True)
-    photo = models.FileField(upload_to=_upload_path('participant-photo'), 
+    photo = models.FileField(upload_to=_upload_path('participant-photo'),
                              blank=True)
     email = models.EmailField(blank=True)
     department = models.CharField(max_length=50, blank=True)

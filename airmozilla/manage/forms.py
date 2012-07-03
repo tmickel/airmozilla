@@ -4,7 +4,6 @@ from django.contrib.auth.models import User, Group
 from funfactory.urlresolvers import reverse
 
 from airmozilla.base.forms import BaseModelForm
-from airmozilla.base.utils import unique_slugify
 from airmozilla.main.models import Category, Event, EventOldSlug, \
                                    Participant, Tag
 
@@ -77,7 +76,7 @@ class EventRequestForm(BaseModelForm):
     def clean_slug(self):
         """Enforce unique slug across current slugs and old slugs."""
         slug = self.cleaned_data['slug']
-        in_use = (Event.objects.filter(slug=slug) or 
+        in_use = (Event.objects.filter(slug=slug) or
                   EventOldSlug.objects.filter(slug=slug))
         if in_use and in_use[0].id != self.instance.id:
             raise forms.ValidationError('This slug is already in use.')
@@ -108,6 +107,7 @@ class EventEditForm(EventRequestForm):
             'featured', 'placeholder_img', 'description', 'start_time',
             'end_time', 'participants', 'location', 'category', 'tags',
             'call_info', 'additional_links')
+
 
 class EventFindForm(BaseModelForm):
     class Meta:

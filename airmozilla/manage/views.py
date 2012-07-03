@@ -141,7 +141,7 @@ def participant_edit(request, id):
         if form.is_valid():
             participant = form.save(commit=False)
             if not participant.slug:
-                participant.slug = unique_slugify(participant.name, 
+                participant.slug = unique_slugify(participant.name,
                                                   [Participant])
             participant.save()
             return redirect('manage:participants')
@@ -160,7 +160,7 @@ def participant_new(request):
         if form.is_valid():
             participant = form.save(commit=False)
             if not participant.slug:
-                participant.slug = unique_slugify(participant.name, 
+                participant.slug = unique_slugify(participant.name,
                                                   [Participant])
             participant.save()
             return redirect('manage:participants')
@@ -186,7 +186,7 @@ def events(request):
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
     initiated = (Event.objects.filter(status=Event.STATUS_INITIATED)
                              .order_by('start_time'))
-    upcoming = Event.objects.filter(status=Event.STATUS_SCHEDULED, 
+    upcoming = Event.objects.filter(status=Event.STATUS_SCHEDULED,
                                     end_time__gt=now).order_by('start_time')
     archived = Event.objects.filter(end_time__lt=now).order_by('-end_time')
     paginator = Paginator(archived, 10)
@@ -205,6 +205,7 @@ def events(request):
         'search_results': search_results
     })
 
+
 @staff_required
 @permission_required('change_event')
 def event_edit(request, id):
@@ -217,8 +218,8 @@ def event_edit(request, id):
             event = form.save(commit=False)
             if event.slug != old_slug:
                 if not event.slug:
-                    event.slug = unique_slugify(event.title, 
-                        [Event, EventOldSlug], 
+                    event.slug = unique_slugify(event.title,
+                        [Event, EventOldSlug],
                         event.start_time.strftime('%Y%m%d'))
                 EventOldSlug.objects.create(slug=old_slug, event=event)
             event.save()
