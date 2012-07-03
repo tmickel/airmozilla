@@ -87,6 +87,30 @@ class EventEditForm(EventRequestForm):
     def __init__(self, *args, **kwargs):
         super(EventEditForm, self).__init__(*args, **kwargs)
 
+    class Meta:
+        model = Event
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4}),
+            'call_info': forms.Textarea(attrs={'rows': 3}),
+            'additional_links': forms.Textarea(attrs={'rows': 3}),
+        }
+        fields = ('title', 'slug', 'video_url', 'status', 'public',
+            'featured', 'placeholder_img', 'description', 'start_time',
+            'end_time', 'participants', 'location', 'category', 'tags',
+            'call_info', 'additional_links')
+
+class EventFindForm(BaseModelForm):
+    class Meta:
+        model = Event
+        fields = ('title',)
+
+    def clean_title(self):
+        title = self.cleaned_data['title']
+        if not Event.objects.filter(title__icontains=title):
+            raise forms.ValidationError('No event with this title found.')
+        return title
+
+
 class ParticipantEditForm(BaseModelForm):
     class Meta:
         model = Participant

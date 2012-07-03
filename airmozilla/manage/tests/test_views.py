@@ -207,9 +207,9 @@ class TestEvents(TestCase):
         parsed_fail = json.loads(response_fail.content)
         eq_(parsed_fail, {'participants': []})
 
-    def test_event_edit(self):
-        """The event editor page responds successfully."""
-        response = self.client.get(reverse('manage:event_edit'))
+    def test_events(self):
+        """The events page responds successfully."""
+        response = self.client.get(reverse('manage:events'))
         eq_(response.status_code, 200)
 
 

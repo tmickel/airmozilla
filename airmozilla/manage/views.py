@@ -11,9 +11,10 @@ from django.utils.timezone import utc
 from airmozilla.base.utils import json_view, unique_slugify
 from airmozilla.main.models import Category, Event, Participant, Tag
 from airmozilla.manage.forms import CategoryForm, GroupEditForm, \
-                                    EventEditForm, EventRequestForm, \
-                                    ParticipantEditForm, ParticipantFindForm, \
-                                    UserEditForm, UserFindForm
+                                    EventEditForm, EventFindForm, \
+                                    EventRequestForm, ParticipantEditForm, \
+                                    ParticipantFindForm, UserEditForm, \
+                                    UserFindForm
 
 staff_required = user_passes_test(lambda u: u.is_staff)
 
@@ -103,52 +104,6 @@ def group_new(request):
 
 
 @staff_required
-@permission_required('add_event')
-def event_request(request):
-    """Event request page:  create new events to be published."""
-    if request.method == 'POST':
-        form = EventRequestForm(request.POST, request.FILES, instance=Event())
-        if form.is_valid():
-            event = form.save(commit=False)
-            if not event.slug:
-                event.slug = unique_slugify(event.title, Event, 
-                    event.start_time.strftime('%Y%m%d'))
-            event.save()
-            form.save_m2m()
-            return redirect('manage:home')
-    else:
-        form = EventRequestForm()
-    return render(request, 'manage/event_request.html', {'form': form})
-
-
-@staff_required
-@permission_required('add_event')
-@json_view
-def tag_autocomplete(request):
-    """ Feeds JSON tag names to the Event Request form. """
-    query = request.GET['q']
-    tags = Tag.objects.filter(name__istartswith=query)[:5]
-    tag_names = [{'id': t.name, 'text': t.name} for t in tags]
-    # for new tags - the first tag is the query
-    tag_names.insert(0, {'id': query, 'text': query})
-    return {'tags': tag_names}
-
-
-@staff_required
-@permission_required('add_event')
-@json_view
-def participant_autocomplete(request):
-    """ Participant names to Event Request autocompleter. """
-    query = request.GET['q']
-    participants = Participant.objects.filter(name__icontains=query)
-    # Only match names with a component which starts with the query
-    regex = re.compile(r'\b%s' % re.escape(query.split()[0]), re.I)
-    participant_names = [{'id': p.name, 'text': p.name}
-                         for p in participants if regex.findall(p.name)]
-    return {'participants': participant_names[:5]}
-
-
-@staff_required
 @permission_required('change_participant')
 def participants(request):
     """Participants page:  view and search participants/speakers. """
@@ -218,15 +173,35 @@ def participant_new(request):
 @permission_required('change_event')
 def events(request):
     """Event edit/production:  approve, change, and publish events."""
+    search_results = []
+    if request.method == 'POST':
+        search_form = EventFindForm(request.POST)
+        if search_form.is_valid():
+            search_results = Event.objects.filter(
+                             title__icontains=search_form.cleaned_data['title']
+                             ).order_by('-end_time')
+    else:
+        search_form = EventFindForm()
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
-    initiated = Event.objects.filter(status=Event.STATUS_INITIATED)
+    initiated = (Event.objects.filter(status=Event.STATUS_INITIATED)
+                             .order_by('start_time'))
     upcoming = Event.objects.filter(status=Event.STATUS_SCHEDULED, 
-                                    end_time__gt=now)
-    archived = Event.objects.filter(end_time__lt=now)
+                                    end_time__gt=now).order_by('start_time')
+    archived = Event.objects.filter(end_time__lt=now).order_by('-end_time')
+    paginator = Paginator(archived, 10)
+    page = request.GET.get('page')
+    try:
+        archived_paged = paginator.page(page)
+    except PageNotAnInteger:
+        archived_paged = paginator.page(1)
+    except EmptyPage:
+        archived_paged = paginator.page(paginator.num_pages)
     return render(request, 'manage/events.html', {
         'initiated': initiated,
         'upcoming': upcoming,
-        'archived': archived
+        'paginate': archived_paged,
+        'form': search_form,
+        'search_results': search_results
     })
 
 @staff_required
@@ -237,7 +212,12 @@ def event_edit(request, id):
     if request.method == 'POST':
         form = EventEditForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
-            form.save()
+            event = form.save(commit=False)
+            if not event.slug:
+                event.slug = unique_slugify(event.title, Event, 
+                    event.start_time.strftime('%Y%m%d'))
+            event.save()
+            form.save_m2m()
             return redirect('manage:events')
     else:
         ptags = ','.join([str(p) for p in event.participants.all()])
@@ -246,6 +226,52 @@ def event_edit(request, id):
                              initial={'participants': ptags, 'tags': tags})
     return render(request, 'manage/event_edit.html', {'form': form,
                                                       'event': event})
+
+
+@staff_required
+@permission_required('add_event')
+def event_request(request):
+    """Event request page:  create new events to be published."""
+    if request.method == 'POST':
+        form = EventRequestForm(request.POST, request.FILES, instance=Event())
+        if form.is_valid():
+            event = form.save(commit=False)
+            if not event.slug:
+                event.slug = unique_slugify(event.title, Event, 
+                    event.start_time.strftime('%Y%m%d'))
+            event.save()
+            form.save_m2m()
+            return redirect('manage:home')
+    else:
+        form = EventRequestForm()
+    return render(request, 'manage/event_request.html', {'form': form})
+
+
+@staff_required
+@permission_required('add_event')
+@json_view
+def tag_autocomplete(request):
+    """ Feeds JSON tag names to the Event Request form. """
+    query = request.GET['q']
+    tags = Tag.objects.filter(name__istartswith=query)[:5]
+    tag_names = [{'id': t.name, 'text': t.name} for t in tags]
+    # for new tags - the first tag is the query
+    tag_names.insert(0, {'id': query, 'text': query})
+    return {'tags': tag_names}
+
+
+@staff_required
+@permission_required('add_event')
+@json_view
+def participant_autocomplete(request):
+    """ Participant names to Event Request autocompleter. """
+    query = request.GET['q']
+    participants = Participant.objects.filter(name__icontains=query)
+    # Only match names with a component which starts with the query
+    regex = re.compile(r'\b%s' % re.escape(query.split()[0]), re.I)
+    participant_names = [{'id': p.name, 'text': p.name}
+                         for p in participants if regex.findall(p.name)]
+    return {'participants': participant_names[:5]}
 
 
 @staff_required
