@@ -164,25 +164,28 @@ def events(request):
 def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
-    old_slug = unicode(event.slug)
     if request.method == 'POST':
+        old_slug = event.slug
         form = EventEditForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
             event = form.save(commit=False)
+            if not event.slug:
+                event.slug = unique_slugify(event.title,
+                    [Event, EventOldSlug],
+                    event.start_time.strftime('%Y%m%d'))
             if event.slug != old_slug:
-                if not event.slug:
-                    event.slug = unique_slugify(event.title,
-                        [Event, EventOldSlug],
-                        event.start_time.strftime('%Y%m%d'))
                 EventOldSlug.objects.create(slug=old_slug, event=event)
             event.save()
             form.save_m2m()
             return redirect('manage:events')
     else:
-        ptags = ','.join([str(p) for p in event.participants.all()])
-        tags = ','.join([str(t) for t in event.tags.all()])
-        form = EventEditForm(instance=event,
-                             initial={'participants': ptags, 'tags': tags})
+        tag_format = lambda objects: ','.join(map(unicode, objects))
+        participants_formatted = tag_format(event.participants.all())
+        tags_formatted = tag_format(event.tags.all())
+        form = EventEditForm(instance=event, initial={
+            'participants': participants_formatted, 
+            'tags': tags_formatted
+        })
     return render(request, 'manage/event_edit.html', {'form': form,
                                                       'event': event})
 
