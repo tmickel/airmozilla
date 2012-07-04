@@ -1,5 +1,12 @@
 $(function() {
     'use strict';
+    var process_tags = function process_tags(element) {
+        var data = [];
+        $(element.val().split(',')).each(function () {
+            data.push({id: this, text: this});
+        });
+        return data;
+    }
     // Autocomplete tags - uses the select2 library
     $('#id_tags').select2({
         tags: [],
@@ -13,13 +20,7 @@ $(function() {
                 return {results: data.tags};
             }
         },
-        initSelection : function (element) {
-            var data = [];
-            $(element.val().split(',')).each(function () {
-                data.push({id: this, text: this});
-            });
-            return data;
-        }
+        initSelection: process_tags
     });
 
     // Datetime picker (jQuery UI)
@@ -50,12 +51,6 @@ $(function() {
                 return {results: data.participants};
             }
         },
-        initSelection : function (element) {
-            var data = [];
-            $(element.val().split(',')).each(function () {
-                data.push({id: this, text: this});
-            });
-            return data;
-        }
+        initSelection: process_tags
     });
 });
