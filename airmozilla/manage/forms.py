@@ -93,9 +93,6 @@ class EventRequestForm(BaseModelForm):
 
 
 class EventEditForm(EventRequestForm):
-    def __init__(self, *args, **kwargs):
-        super(EventEditForm, self).__init__(*args, **kwargs)
-
     class Meta:
         model = Event
         widgets = {
