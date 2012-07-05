@@ -1,21 +1,21 @@
 import datetime
 import re
 
-from django.contrib.auth.decorators import permission_required, \
-                                           user_passes_test
+from django.contrib.auth.decorators import (permission_required,
+                                            user_passes_test)
 from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 from django.utils.timezone import utc
 
 from airmozilla.base.utils import json_view, unique_slugify
-from airmozilla.main.models import Category, Event, EventOldSlug, \
-                                   Participant, Tag
-from airmozilla.manage.forms import CategoryForm, GroupEditForm, \
-                                    EventEditForm, EventFindForm, \
-                                    EventRequestForm, ParticipantEditForm, \
-                                    ParticipantFindForm, UserEditForm, \
-                                    UserFindForm
+from airmozilla.main.models import (Category, Event, EventOldSlug,
+                                    Participant, Tag)
+from airmozilla.manage.forms import (CategoryForm, GroupEditForm,
+                                     EventEditForm, EventFindForm,
+                                     EventRequestForm, ParticipantEditForm,
+                                     ParticipantFindForm, UserEditForm,
+                                     UserFindForm)
 
 staff_required = user_passes_test(lambda u: u.is_staff)
 

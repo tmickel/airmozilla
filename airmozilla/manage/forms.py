@@ -4,8 +4,8 @@ from django.contrib.auth.models import User, Group
 from funfactory.urlresolvers import reverse
 
 from airmozilla.base.forms import BaseModelForm
-from airmozilla.main.models import Category, Event, EventOldSlug, \
-                                   Participant, Tag
+from airmozilla.main.models import (Category, Event, EventOldSlug,
+                                    Participant, Tag)
 
 
 class UserEditForm(BaseModelForm):
