@@ -32,19 +32,17 @@ class TestPages(TestCase):
         """Event view page loads correctly if the event is public and
            scheduled; request a login otherwise."""
         event = Event.objects.get(title='Test event')
-        response_ok = self.client.get(reverse('main:event',
-                                              kwargs={'slug': event.slug}))
+        event_page = reverse('main:event', kwargs={'slug': event.slug})
+        response_ok = self.client.get(event_page)
         eq_(response_ok.status_code, 200)
         event.public = False
         event.save()
-        response_fail = self.client.get(reverse('main:event',
-                                                kwargs={'slug': event.slug}))
+        response_fail = self.client.get(event_page)
         self.assertRedirects(response_fail, reverse('main:login'))
         event.public = True
         event.status = Event.STATUS_INITIATED
         event.save()
-        response_fail = self.client.get(reverse('main:event',
-                                                kwargs={'slug': event.slug}))
+        response_fail = self.client.get(event_page)
         self.assertRedirects(response_fail, reverse('main:login'))
 
     def test_old_slug(self):
@@ -58,11 +56,11 @@ class TestPages(TestCase):
     def test_participant(self):
         """Cleared participant responds successfully; else request a login."""
         participant = Participant.objects.get(name='Tim Mickel')
-        response_ok = self.client.get(reverse('main:participant',
-                                      kwargs={'slug': participant.slug}))
+        participant_page = reverse('main:participant',
+                                   kwargs={'slug': participant.slug})
+        response_ok = self.client.get(participant_page)
         eq_(response_ok.status_code, 200)
         participant.cleared = Participant.CLEARED_NO
         participant.save()
-        response_fail = self.client.get(reverse('main:participant',
-                                        kwargs={'slug': participant.slug}))
+        response_fail = self.client.get(participant_page)
         self.assertRedirects(response_fail, reverse('main:login'))
