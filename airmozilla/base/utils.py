@@ -11,7 +11,7 @@ def unique_slugify(data, models, duplicate_key=''):
     slug_base = slugify(data)
     counter = 0
     slug = slug_base
-    while any(model.objects.filter(slug__iexact=slug) for model in models):
+    while any(model.objects.filter(slug=slug).exists() for model in models):
         counter += 1
         if counter == 1 and duplicate_key:
             slug_base += '-' + duplicate_key
