@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import utc
@@ -17,14 +18,15 @@ def home(request, page=1):
     """Paginated recent videos and live videos."""
     featured = Event.objects.filter(public=True, featured=True)
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
-    past_filter = {'end_time__lt': now, 'status': Event.STATUS_SCHEDULED}
-    live_filter = {'end_time__gt': now, 'start_time__lt': now,
+    past_filter = {'archive_time__lt': now, 'status': Event.STATUS_SCHEDULED}
+    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)
+    live_filter = {'archive_time': None, 'start_time__lt': live_time,
                    'status': Event.STATUS_SCHEDULED}
     if not request.user.is_active:
         past_filter['public'] = True
         live_filter['public'] = True
-    past_events = Event.objects.filter(**past_filter).order_by('-end_time')
-    live_events = Event.objects.filter(**live_filter).order_by('-end_time')
+    past_events = Event.objects.filter(**past_filter).order_by('-archive_time')
+    live_events = Event.objects.filter(**live_filter).order_by('-start_time')
     paginate = Paginator(past_events, 10)
     try:
         past_events_paged = paginate.page(page)

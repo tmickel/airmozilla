@@ -1,6 +1,7 @@
 import datetime
 import re
 
+from django.conf import settings
 from django.contrib.auth.decorators import (permission_required,
                                             user_passes_test)
 from django.contrib.auth.models import User, Group
@@ -133,15 +134,24 @@ def events(request):
         if search_form.is_valid():
             search_results = Event.objects.filter(
                              title__icontains=search_form.cleaned_data['title']
-                             ).order_by('-end_time')
+                             ).order_by('-start_time')
     else:
         search_form = EventFindForm()
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
     initiated = (Event.objects.filter(status=Event.STATUS_INITIATED)
                              .order_by('start_time'))
     upcoming = Event.objects.filter(status=Event.STATUS_SCHEDULED,
-                                    end_time__gt=now).order_by('start_time')
-    archived = Event.objects.filter(end_time__lt=now).order_by('-end_time')
+                                    start_time__gt=now).order_by('start_time')
+    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)    
+    live = (Event.objects.filter(status=Event.STATUS_SCHEDULED,
+                                 start_time__lt=live_time, archive_time=None)
+            .order_by('start_time'))
+    archiving = (Event.objects.filter(status=Event.STATUS_SCHEDULED,
+                                     start_time__lt=now, archive_time__gt=now)
+                 .order_by('-archive_time'))
+    archived = (Event.objects.filter(status=Event.STATUS_SCHEDULED, 
+                                     start_time__lt=now, archive_time__lt=now)
+                 .order_by('-archive_time'))
     paginator = Paginator(archived, 10)
     page = request.GET.get('page')
     try:
@@ -153,6 +163,8 @@ def events(request):
     return render(request, 'manage/events.html', {
         'initiated': initiated,
         'upcoming': upcoming,
+        'live': live,
+        'archiving': archiving,
         'paginate': archived_paged,
         'form': search_form,
         'search_results': search_results
