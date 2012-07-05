@@ -90,7 +90,7 @@ class Event(models.Model):
                         'if not provided, this will be filled in by the ' +
                         'first words of the full description.')
     start_time = models.DateTimeField()
-    archive_time = models.DateTimeField(blank=True)
+    archive_time = models.DateTimeField(blank=True, null=True)
     participants = models.ManyToManyField(Participant,
                           help_text='Speakers or presenters for this event.')
     location = models.CharField(max_length=50)
