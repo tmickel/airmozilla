@@ -94,16 +94,8 @@ class EventRequestForm(BaseModelForm):
 class EventEditForm(EventRequestForm):
     class Meta:
         model = Event
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'call_info': forms.Textarea(attrs={'rows': 3}),
-            'additional_links': forms.Textarea(attrs={'rows': 3}),
-        }
-        fields = ('title', 'slug', 'video_url', 'status', 'public',
-            'featured', 'placeholder_img', 'description', 'start_time',
-            'end_time', 'participants', 'location', 'category', 'tags',
-            'call_info', 'additional_links')
-
+        widgets = EventRequestForm._meta.widgets 
+        exclude = ()
 
 class EventFindForm(BaseModelForm):
     class Meta:
