@@ -240,7 +240,7 @@ class TestEvents(TestCase):
                 'end_time': '2012-06-28 16:45:00',
                 'participants': 'Tim Mickel',
                 'location': 'mtv',
-                'category': '7', 
+                'category': '7',
                 'tags': 'xxx'
             }
         )
@@ -256,6 +256,7 @@ class TestEvents(TestCase):
             }
         )
         eq_(response_fail.status_code, 200)
+
 
 class TestParticipants(TestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
