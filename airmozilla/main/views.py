@@ -53,8 +53,10 @@ def event(request, slug):
     if ((not event.public or event.status == Event.STATUS_INITIATED)
         and not request.user.is_active):
         return redirect('main:login')
-    template = Template(event.template.content)
-    template_tagged = template.substitute(tag=event.template_tag)
+    template_tagged = ''
+    if event.template:
+        template = Template(event.template.content)
+        template_tagged = template.substitute(tag=event.template_tag)
     return render(request, 'main/event.html', {
         'event': event,
         'video': template_tagged,
