@@ -20,7 +20,7 @@
 {% block upcoming %}
   {% if upcoming %}
     {% set widget_title = _('Upcoming') -%}
-    {% set widget_events = upcoming %}
+    {% set widget_events = upcoming -%}
     {% include 'main/_side_events.html' %}
   {% endif %}
 {% endblock %}
