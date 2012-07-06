@@ -1,4 +1,3 @@
-import datetime
 import re
 
 from django.conf import settings
@@ -7,7 +6,6 @@ from django.contrib.auth.decorators import (permission_required,
 from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
-from django.utils.timezone import utc
 
 from airmozilla.base.utils import json_view, unique_slugify
 from airmozilla.main.models import (Category, Event, EventOldSlug,
@@ -137,21 +135,11 @@ def events(request):
                              ).order_by('-start_time')
     else:
         search_form = EventFindForm()
-    now = datetime.datetime.utcnow().replace(tzinfo=utc)
-    initiated = (Event.objects.filter(status=Event.STATUS_INITIATED)
-                             .order_by('start_time'))
-    upcoming = Event.objects.filter(status=Event.STATUS_SCHEDULED,
-                                    start_time__gt=now).order_by('start_time')
-    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)    
-    live = (Event.objects.filter(status=Event.STATUS_SCHEDULED,
-                                 start_time__lt=live_time, archive_time=None)
-            .order_by('start_time'))
-    archiving = (Event.objects.filter(status=Event.STATUS_SCHEDULED,
-                                     start_time__lt=now, archive_time__gt=now)
-                 .order_by('-archive_time'))
-    archived = (Event.objects.filter(status=Event.STATUS_SCHEDULED, 
-                                     start_time__lt=now, archive_time__lt=now)
-                 .order_by('-archive_time'))
+    initiated = Event.objects.initiated().order_by('start_time')
+    upcoming = Event.objects.upcoming().order_by('start_time')
+    live = Event.objects.live().order_by('start_time')
+    archiving = Event.objects.archiving().order_by('-archive_time')
+    archived = Event.objects.archived().order_by('-archive_time')
     paginator = Paginator(archived, 10)
     page = request.GET.get('page')
     try:

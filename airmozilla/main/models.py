@@ -2,7 +2,9 @@ import datetime
 import hashlib
 import os
 
+from django.conf import settings
 from django.db import models
+from django.utils.timezone import utc
 
 
 def _upload_path(tag):
@@ -69,6 +71,29 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.name
 
+class EventManager(models.Manager):
+    now = datetime.datetime.utcnow().replace(tzinfo=utc)
+    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)       
+    
+    def initiated(self):
+        return self.get_query_set().filter(status=Event.STATUS_INITIATED)
+    
+    def upcoming(self):
+        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
+               archive_time=None, start_time__gt=self.live_time)
+
+    def live(self):
+        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
+               archive_time=None, start_time__lt=self.live_time)
+
+    def archiving(self):
+        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
+               archive_time__gt=self.now, start_time__lt=self.now)
+
+    def archived(self):
+        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
+               archive_time__lt=self.now, start_time__lt=self.now)
+
 
 class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
@@ -101,6 +126,7 @@ class Event(models.Model):
     public = models.BooleanField(default=False,
                     help_text='Available to everyone (else MoCo only.)')
     featured = models.BooleanField(default=False)
+    objects = EventManager()
 
 
 class EventOldSlug(models.Model):
