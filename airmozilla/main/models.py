@@ -72,6 +72,18 @@ class Tag(models.Model):
         return self.name
 
 
+class Template(models.Model):
+    """Provides the HTML embed codes, links, etc. for each different type of
+       video or stream."""
+    name = models.CharField(max_length=100)
+    content = models.TextField(help_text='The HTML framework for this' +
+        ' template.  Use ${tag} where the per-event tag should be replaced.' +
+        ' Warning! Changes affect all events associated with this template.')
+
+    def __unicode__(self):
+        return self.name
+
+
 class EventManager(models.Manager):
     def _get_now(self):
         return datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -106,7 +118,8 @@ class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
     slug = models.SlugField(blank=True, max_length=215, unique=True)
-    video_url = models.URLField(blank=True)
+    template = models.ForeignKey(Template, blank=True)
+    template_tag =  models.CharField(max_length=250, blank=True)
     STATUS_INITIATED = 'initiated'
     STATUS_SCHEDULED = 'scheduled'
     STATUS_CHOICES = (
