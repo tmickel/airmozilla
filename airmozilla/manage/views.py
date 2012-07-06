@@ -1,6 +1,6 @@
+import pytz
 import re
 
-from django.conf import settings
 from django.contrib.auth.decorators import (permission_required,
                                             user_passes_test)
 from django.contrib.auth.models import User, Group
@@ -116,6 +116,12 @@ def event_request(request):
             if not event.slug:
                 event.slug = unique_slugify(event.title, [Event, EventOldSlug],
                     event.start_time.strftime('%Y%m%d'))
+            tz = pytz.timezone(request.POST['timezone'])
+            event.start_time = tz.normalize(event.start_time
+                                           .replace(tzinfo=tz))
+            if event.archive_time:
+                event.archive_time = tz.normalize(event.archive_time
+                                                  .replace(tzinfo=tz))
             event.save()
             form.save_m2m()
             return redirect('manage:home')
@@ -177,6 +183,11 @@ def event_edit(request, id):
                     event.start_time.strftime('%Y%m%d'))
             if event.slug != old_slug:
                 EventOldSlug.objects.create(slug=old_slug, event=event)
+            tz = pytz.timezone(request.POST['timezone'])
+            event.start_time = tz.normalize(event.start_time
+                                            .replace(tzinfo=tz))
+            event.archive_time = tz.normalize(event.archive_time
+                                            .replace(tzinfo=tz))
             event.save()
             form.save_m2m()
             return redirect('manage:events')

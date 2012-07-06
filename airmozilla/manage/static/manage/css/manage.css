@@ -61,3 +61,7 @@ div.controls select {
     margin: 0;
     padding: 0;
 }
+
+.ui_tpicker_timezone select {
+    width: 150px;
+}

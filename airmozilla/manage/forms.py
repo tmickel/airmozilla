@@ -1,4 +1,7 @@
+import pytz
+
 from django import forms
+from django.conf import settings
 from django.contrib.auth.models import User, Group
 
 from funfactory.urlresolvers import reverse
@@ -45,6 +48,9 @@ class UserFindForm(BaseModelForm):
 class EventRequestForm(BaseModelForm):
     tags = forms.CharField()
     participants = forms.CharField()
+    TIMEZONE_CHOICES = [(tz, tz) for tz in pytz.common_timezones]
+    timezone = forms.ChoiceField(choices=TIMEZONE_CHOICES,
+                                 initial=settings.TIME_ZONE)
 
     def __init__(self, *args, **kwargs):
         super(EventRequestForm, self).__init__(*args, **kwargs)
@@ -89,8 +95,16 @@ class EventRequestForm(BaseModelForm):
             'call_info': forms.Textarea(attrs={'rows': 3}),
             'additional_links': forms.Textarea(attrs={'rows': 3}),
             'template_environment': forms.Textarea(attrs={'rows': 3})
+            'additional_links': forms.Textarea(attrs={'rows': 3}),
+            'start_time': forms.DateTimeInput(format='%Y-%m-%d %H:%M'),
+            'archive_time': forms.DateTimeInput(format='%Y-%m-%d %H:%M'),
         }
         exclude = ('featured', 'status', 'archive_time')
+        # Fields specified to enforce order
+        fields = ('title', 'slug', 'placeholder_img', 'description',
+        'short_description', 'start_time', 'timezone', 'participants',
+        'location', 'category', 'tags', 'call_info', 'additional_links',
+        'public')
 
 
 class EventEditForm(EventRequestForm):
