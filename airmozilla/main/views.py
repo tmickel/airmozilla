@@ -22,11 +22,16 @@ def home(request, page=1):
     live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)
     live_filter = {'archive_time': None, 'start_time__lt': live_time,
                    'status': Event.STATUS_SCHEDULED}
+    upcoming_filter = {'archive_time': None, 'start_time__gt': live_time,
+                       'status': Event.STATUS_SCHEDULED}
     if not request.user.is_active:
         past_filter['public'] = True
         live_filter['public'] = True
+        upcoming_filter['public'] = True
     past_events = Event.objects.filter(**past_filter).order_by('-archive_time')
-    live_events = Event.objects.filter(**live_filter).order_by('-start_time')
+    live_events = Event.objects.filter(**live_filter).order_by('start_time')
+    upcoming_events = (Event.objects.filter(**upcoming_filter)
+                            .order_by('start_time')[:3])
     paginate = Paginator(past_events, 10)
     try:
         past_events_paged = paginate.page(page)
@@ -40,6 +45,7 @@ def home(request, page=1):
     return render(request, 'main/home.html', {
         'events': past_events_paged,
         'featured': featured,
+        'upcoming': upcoming_events,
         'live': live,
         'also_live': also_live
     })
