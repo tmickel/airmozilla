@@ -71,13 +71,14 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class EventManager(models.Manager):
     now = datetime.datetime.utcnow().replace(tzinfo=utc)
-    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)       
-    
+    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)
+
     def initiated(self):
         return self.get_query_set().filter(status=Event.STATUS_INITIATED)
-    
+
     def upcoming(self):
         return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
                archive_time=None, start_time__gt=self.live_time)
