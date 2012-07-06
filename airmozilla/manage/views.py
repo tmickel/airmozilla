@@ -9,12 +9,12 @@ from django.shortcuts import render, redirect
 
 from airmozilla.base.utils import json_view, unique_slugify
 from airmozilla.main.models import (Category, Event, EventOldSlug,
-                                    Participant, Tag)
+                                    Participant, Tag, Template)
 from airmozilla.manage.forms import (CategoryForm, GroupEditForm,
                                      EventEditForm, EventFindForm,
                                      EventRequestForm, ParticipantEditForm,
-                                     ParticipantFindForm, UserEditForm,
-                                     UserFindForm)
+                                     ParticipantFindForm, TemplateEditForm,
+                                     UserEditForm, UserFindForm)
 
 staff_required = user_passes_test(lambda u: u.is_staff)
 
@@ -296,3 +296,44 @@ def categories(request):
         form = CategoryForm()
     return render(request, 'manage/categories.html',
                   {'categories': categories, 'form': form})
+
+
+@staff_required
+@permission_required('change_template')
+def templates(request):
+    templates = Template.objects.all()
+    return render(request, 'manage/templates.html', {'templates': templates})
+
+@staff_required
+@permission_required('change_template')
+def template_edit(request, id):
+    template = Template.objects.get(id=id)
+    if request.method == 'POST':
+        form = TemplateEditForm(request.POST, instance=template)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:templates')
+    else:
+        form = TemplateEditForm(instance=template)
+    return render(request, 'manage/template_edit.html', {'form': form, 
+                                                         'template': template})
+
+@staff_required
+@permission_required('add_template')
+def template_new(request):
+    if request.method == 'POST':
+        form = TemplateEditForm(request.POST, instance=Template())
+        if form.is_valid():
+            form.save()
+            return redirect('manage:templates')
+    else:
+        form = TemplateEditForm()
+    return render(request, 'manage/template_new.html', {'form': form})
+
+@staff_required
+@permission_required('remove_template')
+def template_remove(request, id):
+    if request.method == 'POST':
+        template = Template.objects.get(id=id)
+        template.delete()
+    return redirect('manage:templates')
