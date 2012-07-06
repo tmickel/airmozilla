@@ -118,7 +118,7 @@ class Event(models.Model):
     """ Events - all the essential data and metadata for publishing. """
     title = models.CharField(max_length=200)
     slug = models.SlugField(blank=True, max_length=215, unique=True)
-    template = models.ForeignKey(Template, blank=True)
+    template = models.ForeignKey(Template, blank=True, null=True)
     template_tag =  models.CharField(max_length=250, blank=True)
     STATUS_INITIATED = 'initiated'
     STATUS_SCHEDULED = 'scheduled'
