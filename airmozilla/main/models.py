@@ -73,27 +73,33 @@ class Tag(models.Model):
 
 
 class EventManager(models.Manager):
-    now = datetime.datetime.utcnow().replace(tzinfo=utc)
-    live_time = now + datetime.timedelta(minutes=settings.LIVE_MARGIN)
+    def _get_now(self):
+        return datetime.datetime.utcnow().replace(tzinfo=utc)
+
+    def _get_live_time(self):
+        return (self._get_now() +
+                datetime.timedelta(minutes=settings.LIVE_MARGIN))
 
     def initiated(self):
         return self.get_query_set().filter(status=Event.STATUS_INITIATED)
 
     def upcoming(self):
         return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time=None, start_time__gt=self.live_time)
+               archive_time=None, start_time__gt=self._get_live_time())
 
     def live(self):
         return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time=None, start_time__lt=self.live_time)
+               archive_time=None, start_time__lt=self._get_live_time())
 
     def archiving(self):
         return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time__gt=self.now, start_time__lt=self.now)
+               archive_time__gt=self._get_now(),
+               start_time__lt=self._get_now())
 
     def archived(self):
         return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time__lt=self.now, start_time__lt=self.now)
+               archive_time__lt=self._get_now(),
+               start_time__lt=self._get_now())
 
 
 class Event(models.Model):
