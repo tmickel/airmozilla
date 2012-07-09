@@ -77,8 +77,9 @@ class Template(models.Model):
        video or stream."""
     name = models.CharField(max_length=100)
     content = models.TextField(help_text='The HTML framework for this' +
-        ' template.  Use ${tag} where the per-event tag should be replaced.' +
-        ' Warning! Changes affect all events associated with this template.')
+        ' template.  Use {{ tag }} for the per-event tag.  Other Jinja2' +
+        ' constructs are also allowed.  Warning! Changes affect all events' +
+        ' associated with this template.')
 
     def __unicode__(self):
         return self.name

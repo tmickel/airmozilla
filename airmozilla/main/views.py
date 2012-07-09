@@ -1,8 +1,10 @@
 import datetime
-from string import Template
+import hashlib
 
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
+
+from jingo import Template
 
 from airmozilla.main.models import Event, EventOldSlug, Participant
 
@@ -55,8 +57,12 @@ def event(request, slug):
         return redirect('main:login')
     template_tagged = ''
     if event.template:
+        context = {
+            'md5': lambda s: hashlib.md5(s).hexdigest(),
+            'tag': event.template_tag
+        }
         template = Template(event.template.content)
-        template_tagged = template.substitute(tag=event.template_tag)
+        template_tagged = template.render(context)
     return render(request, 'main/event.html', {
         'event': event,
         'video': template_tagged,
