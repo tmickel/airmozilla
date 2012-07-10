@@ -1,6 +1,6 @@
 $(function() {
     'use strict';
-    $('time.jstime').each(function(i, time) {
+    $('time.jsdate').each(function(i, time) {
         // Find all relevant <time> elements and replace with formatted time.
         var $element = $(time);
         var datetime = $element.attr('datetime');
@@ -8,4 +8,6 @@ $(function() {
         var parsed = moment(datetime);
         $element.text(parsed.format(format));
     });
+    $.timeago.settings.allowFuture = true;
+    $('time.timeago').timeago();
 });

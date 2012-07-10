@@ -32,6 +32,10 @@ div.controls select {
     display: inline;
 }
 
+.timeago {
+    border-bottom: 1px dotted #000;
+}
+
 /* timepicker */
 
 .ui-timepicker-div .ui-widget-header {
