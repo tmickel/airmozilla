@@ -1,10 +1,10 @@
 from django.db import models
-from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.fields import Field
 from django.forms.util import ValidationError
 from django.utils import simplejson as json
 
 # modified version of JSONField and JSONFormField: bradjasper/django-jsonfield
+
 
 class EnvironmentFormField(Field):
     def clean(self, value):
@@ -57,5 +57,5 @@ class EnvironmentField(models.TextField):
         return ','.join(input_pairs)
 
     def formfield(self, **kwargs):
-        return super(EnvironmentField, self).formfield(form_class=
-                                             EnvironmentFormField, **kwargs)
+        return super(EnvironmentField, self).formfield(
+            form_class=EnvironmentFormField, **kwargs)

@@ -96,8 +96,9 @@ class EventRequestForm(BaseModelForm):
 class EventEditForm(EventRequestForm):
     class Meta:
         model = Event
-        widgets = EventRequestForm._meta.widgets 
+        widgets = EventRequestForm._meta.widgets
         exclude = ()
+
 
 class EventFindForm(BaseModelForm):
     class Meta:

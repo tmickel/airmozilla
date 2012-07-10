@@ -319,6 +319,7 @@ def templates(request):
     templates = Template.objects.all()
     return render(request, 'manage/templates.html', {'templates': templates})
 
+
 @staff_required
 @permission_required('change_template')
 def template_edit(request, id):
@@ -330,8 +331,9 @@ def template_edit(request, id):
             return redirect('manage:templates')
     else:
         form = TemplateEditForm(instance=template)
-    return render(request, 'manage/template_edit.html', {'form': form, 
+    return render(request, 'manage/template_edit.html', {'form': form,
                                                          'template': template})
+
 
 @staff_required
 @permission_required('add_template')
@@ -344,6 +346,7 @@ def template_new(request):
     else:
         form = TemplateEditForm()
     return render(request, 'manage/template_new.html', {'form': form})
+
 
 @staff_required
 @permission_required('remove_template')
