@@ -78,10 +78,12 @@ class Template(models.Model):
     """Provides the HTML embed codes, links, etc. for each different type of
        video or stream."""
     name = models.CharField(max_length=100)
-    content = models.TextField(help_text='The HTML framework for this' +
-        ' template.  Use {{ tag }} for the per-event tag.  Other Jinja2' +
-        ' constructs are also allowed.  Warning! Changes affect all events' +
-        ' associated with this template.')
+    content = models.TextField(help_text='The HTML framework for this'
+        ' template.  Use {{ any_variable_name }} for per-event tags.'
+        ' Other Jinja2 constructs are also available, along with the related'
+        ' <code>request</code>, <code>datetime</code>, and <code>event</code>'
+        ' objects, and the <code>md5</code> function. Warning! Changes affect'
+        ' all events associated with this template.')
 
     def __unicode__(self):
         return self.name
