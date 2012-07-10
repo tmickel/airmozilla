@@ -6,6 +6,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import utc
 
+from airmozilla.main.fields import EnvironmentField
+
 
 def _upload_path(tag):
     def _upload_path_tagged(instance, filename):
@@ -120,7 +122,9 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(blank=True, max_length=215, unique=True)
     template = models.ForeignKey(Template, blank=True, null=True)
-    template_tag =  models.CharField(max_length=250, blank=True)
+    template_environment = EnvironmentField(blank=True, help_text='Specify'
+        ' the template variables in the format <code>variable=value,'
+        'variable=value,</code> and so on.')
     STATUS_INITIATED = 'initiated'
     STATUS_SCHEDULED = 'scheduled'
     STATUS_CHOICES = (

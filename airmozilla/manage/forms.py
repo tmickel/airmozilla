@@ -87,7 +87,8 @@ class EventRequestForm(BaseModelForm):
             'description': forms.Textarea(attrs={'rows': 4}),
             'short_description': forms.Textarea(attrs={'rows': 2}),
             'call_info': forms.Textarea(attrs={'rows': 3}),
-            'additional_links': forms.Textarea(attrs={'rows': 3})
+            'additional_links': forms.Textarea(attrs={'rows': 3}),
+            'template_environment': forms.Textarea(attrs={'rows': 3})
         }
         exclude = ('featured', 'status', 'archive_time')
 

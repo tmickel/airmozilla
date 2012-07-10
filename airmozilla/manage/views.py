@@ -7,6 +7,8 @@ from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 
+from jinja2 import Environment, meta
+
 from airmozilla.base.utils import json_view, unique_slugify
 from airmozilla.main.models import (Category, Event, EventOldSlug,
                                     Participant, Tag, Template)
@@ -296,6 +298,19 @@ def categories(request):
         form = CategoryForm()
     return render(request, 'manage/categories.html',
                   {'categories': categories, 'form': form})
+
+
+@staff_required
+@permission_required('change_template')
+@json_view
+def template_env_autofill(request):
+    template_id = request.GET['template']
+    template = Template.objects.get(id=template_id)
+    env = Environment()
+    ast = env.parse(template.content)
+    undeclared_variables = list(meta.find_undeclared_variables(ast))
+    var_templates = ["%s=" % v for v in undeclared_variables]
+    return {'variables':  ','.join(var_templates)}
 
 
 @staff_required

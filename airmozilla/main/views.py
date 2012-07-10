@@ -59,8 +59,12 @@ def event(request, slug):
     if event.template:
         context = {
             'md5': lambda s: hashlib.md5(s).hexdigest(),
-            'tag': event.template_tag
+            'event': event,
+            'request': request,
+            'datetime': datetime.datetime.utcnow()
         }
+        if isinstance(event.template_environment, dict):
+            context.update(event.template_environment)
         template = Template(event.template.content)
         template_tagged = template.render(context)
     return render(request, 'main/event.html', {
