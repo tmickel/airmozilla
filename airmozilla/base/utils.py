@@ -24,7 +24,7 @@ def unique_slugify(data, models, duplicate_key=''):
 def tz_apply(datetime, tz):
     """Returns a datetime with tz applied, timezone-aware.
        Strips the Django-inserted timezone from settings.TIME_ZONE."""
-    datetime.replace(tzinfo=None)
+    datetime = datetime.replace(tzinfo=None)
     return tz.normalize(tz.localize(datetime))
 
 # From socorro-crashstats
