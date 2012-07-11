@@ -1,6 +1,6 @@
 $(function() {
     'use strict';
-    $('time.jsdate').each(function(i, time) {
+    $('time.jstime').each(function(i, time) {
         // Find all relevant <time> elements and replace with formatted time.
         var $element = $(time);
         var datetime = $element.attr('datetime');
