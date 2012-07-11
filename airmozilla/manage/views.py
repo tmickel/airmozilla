@@ -310,7 +310,7 @@ def template_env_autofill(request):
     ast = env.parse(template.content)
     undeclared_variables = list(meta.find_undeclared_variables(ast))
     var_templates = ["%s=" % v for v in undeclared_variables]
-    return {'variables':  ','.join(var_templates)}
+    return {'variables':  ', '.join(var_templates)}
 
 
 @staff_required

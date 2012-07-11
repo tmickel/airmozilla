@@ -125,8 +125,8 @@ class Event(models.Model):
     slug = models.SlugField(blank=True, max_length=215, unique=True)
     template = models.ForeignKey(Template, blank=True, null=True)
     template_environment = EnvironmentField(blank=True, help_text='Specify'
-        ' the template variables in the format <code>variable=value,'
-        'variable=value,</code> and so on.')
+        ' the template variables in the format <code>variable1=value, '
+        'variable2=value,</code> and so on.')
     STATUS_INITIATED = 'initiated'
     STATUS_SCHEDULED = 'scheduled'
     STATUS_CHOICES = (
