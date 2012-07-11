@@ -49,13 +49,12 @@ $(function() {
     $('#id_template').change(function() {
         var selected = $('#id_template').val();
         if (selected) {
-            $.ajax({
-                url: '/manage/templates/env-autofill',
-                data: {'template': selected},
-                success: function(data, status) {
+            $.getJSON('/manage/templates/env-autofill',
+                {'template': selected},
+                function(data) {
                     $('#id_template_environment').val(data['variables']);
                 }
-            });
+            );
         }
     });
 });
