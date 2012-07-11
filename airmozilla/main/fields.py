@@ -12,9 +12,9 @@ class EnvironmentFormField(Field):
             return None
         built = {}
         value = super(EnvironmentFormField, self).clean(value)
-        kv_pairs = [v.strip() for v in value.split(',') if v.strip()]
+        kv_pairs = [v.strip() for v in value.split('\n') if v.strip()]
         for kv in kv_pairs:
-            split = kv.split('=')
+            split = kv.split('=', 1)
             if len(split) != 2:
                 raise ValidationError('Please enter valid key-value pairs.')
             built[split[0].strip()] = split[1].strip()
@@ -47,14 +47,14 @@ class EnvironmentField(models.TextField):
         return self.get_prep_value(value)
 
     def value_from_object(self, obj):
-        """Convert object to k=v,k=v,... input pairs."""
+        """Convert object to k=v\nk=v\n... input pairs."""
         obj_value = super(EnvironmentField, self).value_from_object(obj)
         if isinstance(obj_value, basestring) or obj_value is None:
             return obj_value
         input_pairs = []
         for k, v in obj_value.iteritems():
             input_pairs.append('%s=%s' % (k, v))
-        return ','.join(input_pairs)
+        return '\n'.join(input_pairs)
 
     def formfield(self, **kwargs):
         return super(EnvironmentField, self).formfield(
