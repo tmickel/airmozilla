@@ -148,6 +148,7 @@ class TestEvents(TestCase):
         'start_time': '2012-3-4 12:00',
         'timezone': 'US/Pacific'
     }
+    placeholder = 'airmozilla/manage/tests/firefox.png'
 
     def setUp(self):
         User.objects.create_superuser('fake', 'fake@fake.com', 'fake')
@@ -157,7 +158,7 @@ class TestEvents(TestCase):
         """Event request responses and successful creation in the db."""
         response = self.client.get(reverse('manage:event_request'))
         eq_(response.status_code, 200)
-        with open('airmozilla/manage/tests/firefox.png') as fp:
+        with open(self.placeholder) as fp:
             response_ok = self.client.post(reverse('manage:event_request'),
                 dict(self.event_base_data, placeholder_img=fp,
                      title='Airmozilla Launch Test')
@@ -275,7 +276,7 @@ class TestEvents(TestCase):
         utc = pytz.timezone('UTC')
 
         def _tz_test(url, tzdata, correct_date, msg):
-            with open('airmozilla/manage/tests/firefox.png') as fp:
+            with open(self.placeholder) as fp:
                 base_data = dict(self.event_base_data,
                                  title='timezone test', placeholder_img=fp)
                 self.client.post(url, dict(base_data, **tzdata))
