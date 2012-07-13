@@ -1,11 +1,14 @@
 import datetime
 import hashlib
 
+from django.conf import settings
+from django.contrib.sites.models import RequestSite
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
 
 from jingo import Template
 
+from airmozilla.base.utils import calendar_view
 from airmozilla.main.models import Event, EventOldSlug, Participant
 
 
@@ -84,3 +87,32 @@ def participant(request, slug):
         'participant': participant,
         'featured': featured
     })
+
+@calendar_view
+def events_calendar(request, public=True):
+    calname = ('Air Mozilla Public Events'
+                if public else 'Air Mozilla MoCo Events')
+    calendar = {'filename': 'AirmozEvents.ics',
+                'calname': calname}
+    now = datetime.datetime.utcnow()
+    # 60 events centered around now.
+    events = list(Event.objects.approved()
+                        .filter(start_time__lt=now, public=public) 
+                        .order_by('-start_time')[:settings.CALENDAR_SIZE])
+    events += list(Event.objects.approved()
+                        .filter(start_time__gte=now, public=public)
+                        .order_by('start_time')[:settings.CALENDAR_SIZE])
+    base_url = '%s://%s/' % (request.is_secure() and 'https' or 'http',
+                             RequestSite(request).domain)
+    events_response = []
+    for event in events:
+        events_response.append({
+            'summary': event.title,
+            'dtstart': event.start_time,
+            'dtend': event.start_time + datetime.timedelta(hours=1),
+            'description': event.description,
+            'location': event.location,
+            'url': base_url + event.slug + '/'
+        })
+    calendar['events'] = events_response
+    return calendar

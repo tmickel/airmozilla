@@ -1,5 +1,6 @@
 import functools
 import json
+import vobject
 
 from django import http
 from django.template.defaultfilters import slugify
@@ -49,3 +50,22 @@ def _json_clean(value):
     # although python's standard library does not, so we do it here.
     # http://stackoverflow.com/questions/1580647/json-why-are-forward-slashes-escaped
     return value.replace("</", "<\\/")
+
+
+def calendar_view(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        data = f(*args, **kwargs)
+        cal = vobject.iCalendar()
+        cal.add('X-WR-CALNAME').value = data['calname']
+        for event in data['events']:
+            vevent = cal.add('vevent')
+            for k, v in event.iteritems():
+                vevent.add(k).value = v
+        icalstream = cal.serialize()
+        filename = data['filename'] if data['filename'] else 'Airmozilla.ics'
+        response = http.HttpResponse(icalstream, 
+                                     mimetype='text/calendar; charset=utf-8')
+        response['Content-Disposition'] = ('inline; filename=%s' % filename)
+        return response
+    return wrapper
