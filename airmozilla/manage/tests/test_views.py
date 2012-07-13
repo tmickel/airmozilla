@@ -159,11 +159,13 @@ class TestEvents(TestCase):
         response = self.client.get(reverse('manage:event_request'))
         eq_(response.status_code, 200)
         with open(self.placeholder) as fp:
-            response_ok = self.client.post(reverse('manage:event_request'),
+            response_ok = self.client.post(
+                reverse('manage:event_request'),
                 dict(self.event_base_data, placeholder_img=fp,
                      title='Airmozilla Launch Test')
             )
-            response_fail = self.client.post(reverse('manage:event_request'),
+            response_fail = self.client.post(
+                reverse('manage:event_request'),
                 {
                     'title': 'Test fails, not enough data!',
                 }
@@ -176,7 +178,8 @@ class TestEvents(TestCase):
 
     def test_tag_autocomplete(self):
         """Autocomplete makes JSON for fixture tags and a nonexistent tag."""
-        response = self.client.get(reverse('manage:tag_autocomplete'),
+        response = self.client.get(
+            reverse('manage:tag_autocomplete'),
             {
                 'q': 'tes'
             }
@@ -190,7 +193,8 @@ class TestEvents(TestCase):
 
     def test_participant_autocomplete(self):
         """Autocomplete makes JSON pages and correct results for fixtures."""
-        response = self.client.get(reverse('manage:participant_autocomplete'),
+        response = self.client.get(
+            reverse('manage:participant_autocomplete'),
             {
                 'q': 'Ti'
             }
@@ -235,16 +239,16 @@ class TestEvents(TestCase):
         response = self.client.get(reverse('manage:event_edit',
                                            kwargs={'id': event.id}))
         eq_(response.status_code, 200)
-        response_ok = self.client.post(reverse('manage:event_edit',
-                                               kwargs={'id': event.id}),
+        response_ok = self.client.post(
+            reverse('manage:event_edit', kwargs={'id': event.id}),
             dict(self.event_base_data, title='Tested event')
         )
         self.assertRedirects(response_ok, reverse('manage:events'))
         ok_(EventOldSlug.objects.get(slug='test-event', event=event))
         event = Event.objects.get(title='Tested event')
         eq_(event.slug, 'tested-event')
-        response_fail = self.client.post(reverse('manage:event_edit',
-                                                 kwargs={'id': event.id}),
+        response_fail = self.client.post(
+            reverse('manage:event_edit', kwargs={'id': event.id}),
             {
                 'title': 'not nearly enough data',
                 'status': Event.STATUS_SCHEDULED
@@ -256,7 +260,8 @@ class TestEvents(TestCase):
         """Event editing results in correct template environments."""
         event = Event.objects.get(title='Test event')
         url = reverse('manage:event_edit', kwargs={'id': event.id})
-        response_ok = self.client.post(url,
+        response_ok = self.client.post(
+            url,
             dict(self.event_base_data, title='template edit',
                  template_environment='tv1=\'hi\'\ntv2===')
         )
@@ -284,7 +289,8 @@ class TestEvents(TestCase):
                                       start_time=correct_date)
             ok_(event, msg + ' vs. ' + str(event.start_time))
         url = reverse('manage:event_request')
-        _tz_test(url,
+        _tz_test(
+            url,
             {
                 'start_time': '2012-08-03 12:00',
                 'timezone': 'US/Eastern'
@@ -292,7 +298,8 @@ class TestEvents(TestCase):
             datetime.datetime(2012, 8, 3, 16).replace(tzinfo=utc),
             'Event request summer date - Eastern UTC-04 input'
         )
-        _tz_test(url,
+        _tz_test(
+            url,
             {
                 'start_time': '2012-11-30 3:00',
                 'timezone': 'Europe/Paris'
@@ -302,7 +309,8 @@ class TestEvents(TestCase):
         )
         event = Event.objects.get(title='Test event')
         url = reverse('manage:event_edit', kwargs={'id': event.id})
-        _tz_test(url,
+        _tz_test(
+            url,
             {
                 'start_time': '2012-08-03 15:00',
                 'timezone': 'US/Pacific'
@@ -310,7 +318,8 @@ class TestEvents(TestCase):
             datetime.datetime(2012, 8, 3, 22).replace(tzinfo=utc),
             'Modify event summer date - Pacific UTC-07 input'
         )
-        _tz_test(url,
+        _tz_test(
+            url,
             {
                 'start_time': '2012-12-25 15:00',
                 'timezone': 'US/Pacific'
