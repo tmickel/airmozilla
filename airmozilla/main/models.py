@@ -100,23 +100,32 @@ class EventManager(models.Manager):
     def initiated(self):
         return self.get_query_set().filter(status=Event.STATUS_INITIATED)
 
+    def approved(self):
+        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED)
+    
     def upcoming(self):
-        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time=None, start_time__gt=self._get_live_time())
+        return self.approved().filter(
+            archive_time=None,
+            start_time__gt=self._get_live_time()
+        )
 
     def live(self):
-        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time=None, start_time__lt=self._get_live_time())
+        return self.approved().filter(
+            archive_time=None,
+            start_time__lt=self._get_live_time()
+        )
 
     def archiving(self):
-        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time__gt=self._get_now(),
-               start_time__lt=self._get_now())
+        return self.approved().filter(
+            archive_time__gt=self._get_now(),
+            start_time__lt=self._get_now()
+        )
 
     def archived(self):
-        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED,
-               archive_time__lt=self._get_now(),
-               start_time__lt=self._get_now())
+        return self.approved().filter(
+            archive_time__lt=self._get_now(),
+            start_time__lt=self._get_now()
+        )
 
 
 class Event(models.Model):
