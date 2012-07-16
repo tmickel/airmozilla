@@ -3,6 +3,7 @@ import hashlib
 import os
 
 from django.conf import settings
+from django.contrib.auth.models import Group, User
 from django.core.cache import cache
 from django.db import models
 from django.dispatch import receiver
@@ -91,6 +92,16 @@ class Template(models.Model):
         return self.name
 
 
+class Approval(models.Model):
+    """Sign events with approvals from appropriate user groups to log and
+       designate that an event can be published."""
+    group = models.ForeignKey(Group)
+    user = models.ForeignKey(User, blank=True, null=True)
+    approved = models.BooleanField()
+    processed = models.BooleanField(default=False)
+    processed_time = models.DateTimeField(blank=True, null=True)
+
+
 class EventManager(models.Manager):
     def _get_now(self):
         return datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -103,8 +114,9 @@ class EventManager(models.Manager):
         return self.get_query_set().filter(status=Event.STATUS_INITIATED)
 
     def approved(self):
-        return self.get_query_set().filter(status=Event.STATUS_SCHEDULED)
-    
+        return (self.get_query_set().filter(status=Event.STATUS_SCHEDULED)
+                                    .exclude(approvals__approved=False)
+                                    .exclude(approvals__processed=False))
     def upcoming(self):
         return self.approved().filter(
             archive_time=None,
@@ -146,6 +158,7 @@ class Event(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,
                               default=STATUS_INITIATED)
+    approvals = models.ManyToManyField(Approval, blank=True)
     placeholder_img = models.FileField(upload_to=
                                       _upload_path('event-placeholder'))
     description = models.TextField()
