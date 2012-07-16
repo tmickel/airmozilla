@@ -3,7 +3,9 @@ import hashlib
 import os
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
+from django.dispatch import receiver
 from django.utils.timezone import utc
 
 from airmozilla.main.fields import EnvironmentField
@@ -163,6 +165,12 @@ class Event(models.Model):
                     help_text='Available to everyone (else MoCo only.)')
     featured = models.BooleanField(default=False)
     objects = EventManager()
+
+
+@receiver(models.signals.post_save, sender=Event)
+def event_clear_cache(sender, **kwargs):
+    cache.delete('calendar_public')
+    cache.delete('calendar_private')
 
 
 class EventOldSlug(models.Model):
