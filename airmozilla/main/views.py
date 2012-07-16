@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.cache import cache
 
 from jingo import Template
 
@@ -89,7 +90,12 @@ def participant(request, slug):
         'featured': featured
     })
 
+
 def events_calendar(request, public=True):
+    cache_key = 'calendar_%s' % ('public' if public else 'private')
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
     cal = vobject.iCalendar()
     cal.add('X-WR-CALNAME').value = ('Air Mozilla Public Events' if public
                                      else 'Air Mozilla MoCo Events')
@@ -112,7 +118,8 @@ def events_calendar(request, public=True):
         vevent.add('location').value = event.location
         vevent.add('url').value = base_url + event.slug + '/'
     icalstream = cal.serialize()
-    response = http.HttpResponse(icalstream, 
+    response = http.HttpResponse(icalstream,
                                  mimetype='text/calendar; charset=utf-8')
     response['Content-Disposition'] = ('inline; filename=AirmozillaEvents.ics')
+    cache.set(cache_key, response)
     return response
