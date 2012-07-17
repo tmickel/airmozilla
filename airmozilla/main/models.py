@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.cache import cache
 from django.db import models
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.timezone import utc
 
@@ -92,16 +93,6 @@ class Template(models.Model):
         return self.name
 
 
-class Approval(models.Model):
-    """Sign events with approvals from appropriate user groups to log and
-       designate that an event can be published."""
-    group = models.ForeignKey(Group)
-    user = models.ForeignKey(User, blank=True, null=True)
-    approved = models.BooleanField()
-    processed = models.BooleanField(default=False)
-    processed_time = models.DateTimeField(blank=True, null=True)
-
-
 class EventManager(models.Manager):
     def _get_now(self):
         return datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -111,12 +102,15 @@ class EventManager(models.Manager):
                 datetime.timedelta(minutes=settings.LIVE_MARGIN))
 
     def initiated(self):
-        return self.get_query_set().filter(status=Event.STATUS_INITIATED)
+        return self.get_query_set().filter(Q(status=Event.STATUS_INITIATED) |
+                                           Q(approval__approved=False) |
+                                           Q(approval__processed=False))
 
     def approved(self):
         return (self.get_query_set().filter(status=Event.STATUS_SCHEDULED)
-                                    .exclude(approvals__approved=False)
-                                    .exclude(approvals__processed=False))
+                                    .exclude(approval__approved=False)
+                                    .exclude(approval__processed=False))
+
     def upcoming(self):
         return self.approved().filter(
             archive_time=None,
@@ -158,7 +152,6 @@ class Event(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,
                               default=STATUS_INITIATED)
-    approvals = models.ManyToManyField(Approval, blank=True)
     placeholder_img = models.FileField(upload_to=
                                       _upload_path('event-placeholder'))
     description = models.TextField()
@@ -177,16 +170,31 @@ class Event(models.Model):
     public = models.BooleanField(default=False,
                     help_text='Available to everyone (else MoCo only.)')
     featured = models.BooleanField(default=False)
+    creator = models.ForeignKey(User)
+    created = models.DateTimeField(auto_now_add=True)
     objects = EventManager()
-
-
-@receiver(models.signals.post_save, sender=Event)
-def event_clear_cache(sender, **kwargs):
-    cache.delete('calendar_public')
-    cache.delete('calendar_private')
 
 
 class EventOldSlug(models.Model):
     """Used to permanently redirect old URLs to the new slug location."""
     event = models.ForeignKey(Event)
     slug = models.SlugField(max_length=215, unique=True)
+
+
+class Approval(models.Model):
+    """Sign events with approvals from appropriate user groups to log and
+       designate that an event can be published."""
+    event = models.ForeignKey(Event)
+    group = models.ForeignKey(Group)
+    user = models.ForeignKey(User, blank=True, null=True)
+    approved = models.BooleanField(default=False)
+    processed = models.BooleanField(default=False)
+    processed_time = models.DateTimeField(auto_now=True)
+
+
+@receiver(models.signals.post_save, sender=Event)
+@receiver(models.signals.post_save, sender=Approval)
+def event_clear_cache(sender, **kwargs):
+    cache.delete('calendar_public')
+    cache.delete('calendar_private')
+

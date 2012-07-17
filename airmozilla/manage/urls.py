@@ -30,4 +30,7 @@ urlpatterns = patterns('',
     url(r'^templates/remove/(?P<id>\d+)/$', views.template_remove,
                                             name='template_remove'),
     url(r'^templates/$', views.templates, name='templates'),
+    url(r'^approvals/$', views.approvals, name='approvals'),
+    url(r'^approval/(?P<id>\d+)/$', views.approval_review,
+                                    name='approval_review')
 )

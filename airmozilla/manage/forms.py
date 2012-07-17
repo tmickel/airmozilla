@@ -108,13 +108,22 @@ class EventRequestForm(BaseModelForm):
 
 
 class EventEditForm(EventRequestForm):
+    approvals = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.filter(permissions__codename='change_approval'),
+        required=False,
+    )
+    def __init__(self, *args, **kwargs):
+        super(EventEditForm, self).__init__(*args, **kwargs)
+        approvals = kwargs['instance'].approval_set.all()
+        self.fields['approvals'].initial = [app.group for app in approvals]
     class Meta(EventRequestForm.Meta):
         exclude = ()
         # Fields specified to enforce order
         fields = ('title', 'slug', 'status', 'public', 'featured', 'template',
         'template_environment', 'placeholder_img', 'location', 'description',
         'short_description', 'start_time', 'archive_time', 'timezone',
-        'participants', 'category', 'tags', 'call_info', 'additional_links')
+        'participants', 'category', 'tags', 'call_info', 'additional_links',
+        'approvals')
 
 
 class EventFindForm(BaseModelForm):
