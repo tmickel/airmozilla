@@ -121,6 +121,7 @@ def event_request(request):
             event.start_time = tz_apply(event.start_time, tz)
             if event.archive_time:
                 event.archive_time = tz_apply(event.archive_time, tz)
+            event.creator = request.user
             event.save()
             form.save_m2m()
             return redirect('manage:home')
@@ -384,8 +385,9 @@ def approvals(request):
     user = request.user
     approvals = Approval.objects.filter(group__in=user.groups.all(),
                                         processed=False)
-    recent = Approval.objects.filter(group__in=user.groups.all(),
-                                             processed=True)[:25]
+    recent = (Approval.objects.filter(group__in=user.groups.all(),
+                                             processed=True)
+                      .order_by('-processed_time')[:25])
     return render(request, 'manage/approvals.html', {'approvals': approvals,
                                                      'recent': recent})
 
