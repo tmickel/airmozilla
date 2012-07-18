@@ -32,6 +32,7 @@ def short_desc(event, words=25):
     """Takes an event object and returns a shortened description."""
     return event.short_description or truncate_words(event.description, words)
 
+
 @register.function
 def thumbnail(filename, geometry, **options):
     try:

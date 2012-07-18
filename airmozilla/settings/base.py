@@ -98,3 +98,6 @@ LIVE_MARGIN = 10
 
 # Default amount of time, in minutes, an event spends in the "archiving" state.
 ARCHIVING_MARGIN = 60
+
+# Use PNG for thumbnailing
+THUMBNAIL_FORMAT = 'PNG'

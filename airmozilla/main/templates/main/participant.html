@@ -18,7 +18,7 @@
   </header>
   <div class="entry-content participant-profile">
     {% if participant.photo %}
-      <img src="{{ participant.photo.url }}"
+      <img src="{{ thumbnail(participant.photo, '150x150').url }}"
          alt="{{ participant.name}} Photo">
     {% endif %}
     {% if participant.email %}
