@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.timezone import utc
 
 from airmozilla.main.fields import EnvironmentField
-
+from sorl.thumbnail import ImageField
 
 def _upload_path(tag):
     def _upload_path_tagged(instance, filename):
@@ -25,7 +25,7 @@ class Participant(models.Model):
     """ Participants - speakers at events. """
     name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, max_length=65, unique=True)
-    photo = models.FileField(upload_to=_upload_path('participant-photo'),
+    photo = models.ImageField(upload_to=_upload_path('participant-photo'),
                              blank=True)
     email = models.EmailField(blank=True)
     department = models.CharField(max_length=50, blank=True)
@@ -135,7 +135,7 @@ class Event(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,
                               default=STATUS_INITIATED)
-    placeholder_img = models.FileField(upload_to=
+    placeholder_img = models.ImageField(upload_to=
                                       _upload_path('event-placeholder'))
     description = models.TextField()
     short_description = models.TextField(blank=True, help_text='Optional: ' +
