@@ -41,7 +41,8 @@
       </header>
       <div class="entry-summary">
         <a href="{{ href }}">
-          <img src="{{ thumbnail(live.placeholder_img, '160x160').url }}" 
+          {% set thumb = thumbnail(live.placeholder_img, '160x160') %}
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
                alt="{{ live.title }}" class="wp-post-image">
         </a>
         <p>{{ short_desc(live, 10) }}
@@ -66,8 +67,9 @@
       </header>
       <div class="entry-summary">
         <p class="event-date">{{ event.start_time|js_date }}</p>
+        {% set thumb = thumbnail(event.placeholder_img, '68x68') %}        
         <a href="{{ href }}">
-          <img src="{{ thumbnail(event.placeholder_img, '68x68').url }}"
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
                alt="{{ event.title }}" class="attachment-68x68 wp-post-image">
         </a>
         <p>

@@ -20,8 +20,9 @@
         <tbody>
         {% for participant in paginate %}
             <tr>
-                <td><img src="{{ thumbnail(participant.photo, '32x32').url }}"
-                         alt="Participant photo">
+                {% set thumb = thumbnail(participant.photo, '32x32') %}                
+                <td><img src="{{ thumb.url }}" width="{{ thumb.width }}"
+                         height="{{ thumb.height }}" alt="Participant photo">
                 </td>
                 <td>
                   <a href="{{ url('main:participant', participant.slug)}}">

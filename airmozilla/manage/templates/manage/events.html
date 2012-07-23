@@ -24,7 +24,8 @@
     {% for event in events %}
       <tr>
         <td>
-          <img src="{{ thumbnail(event.placeholder_img, '32x32').url }}"
+          {% set thumb = thumbnail(event.placeholder_img, '32x32') %}        
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
                alt="Placeholder image">
         </td>
         <td>
