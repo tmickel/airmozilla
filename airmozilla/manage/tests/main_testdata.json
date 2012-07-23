@@ -78,7 +78,9 @@
             "template": 1,
             "template_environment": "",
             "creator": 1,
-            "created": "2012-06-21T20:00:00Z"
+            "created": "2012-06-21T20:00:00Z",
+            "modified_user": 1,
+            "modified": "2012-06-21T20:00:00Z"
         }
     },
     {

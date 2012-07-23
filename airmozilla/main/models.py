@@ -170,8 +170,10 @@ class Event(models.Model):
     public = models.BooleanField(default=False,
                     help_text='Available to everyone (else MoCo only.)')
     featured = models.BooleanField(default=False)
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, related_name='creator')
     created = models.DateTimeField(auto_now_add=True)
+    modified_user = models.ForeignKey(User, related_name='modified_user')
+    modified = models.DateTimeField(auto_now=True)
     objects = EventManager()
 
 

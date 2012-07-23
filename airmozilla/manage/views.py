@@ -122,6 +122,7 @@ def event_request(request):
             if event.archive_time:
                 event.archive_time = tz_apply(event.archive_time, tz)
             event.creator = request.user
+            event.modified_user = request.user
             event.save()
             form.save_m2m()
             return redirect('manage:home')
@@ -197,6 +198,7 @@ def event_edit(request, id):
             for approval in approvals_remove:
                 app = Approval.objects.get(group=approval, event=event)
                 app.delete()
+            event.modified_user = request.user
             event.save()
             form.save_m2m()
             return redirect('manage:events')
