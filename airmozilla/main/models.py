@@ -91,7 +91,7 @@ class Template(models.Model):
 
 class Location(models.Model):
     """Venue/location of a video/stream/presentation/etc."""
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=300)
     timezone = models.CharField(max_length=250)
 
     def __unicode__(self):

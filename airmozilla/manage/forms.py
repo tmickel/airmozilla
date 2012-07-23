@@ -12,7 +12,7 @@ from airmozilla.main.models import (Category, Event, EventOldSlug, Location,
                                     Participant, Tag, Template)
 
 
-TIMEZONE_CHOICES = [(tz, tz) for tz in pytz.common_timezones]
+TIMEZONE_CHOICES = [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones]
 
 
 class UserEditForm(BaseModelForm):

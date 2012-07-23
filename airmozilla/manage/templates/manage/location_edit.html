@@ -7,3 +7,18 @@
 {% block manage_content %}
   {% include 'manage/_default_form.html' %}
 {% endblock %}
+
+{% block site_css %}
+  {{ super() }}
+  {% compress css %}
+  <link href="{{ static('manage/css/select2.css') }}" rel="stylesheet" type="text/css">
+  {% endcompress %}
+{% endblock %}
+
+{% block site_js %}
+  {{ super() }}
+  {% compress js %}
+    <script src="{{ static('manage/js/select2.min.js') }}"></script>
+    <script src="{{ static('manage/js/locations.js') }}"></script>
+  {% endcompress %}
+{% endblock %}
