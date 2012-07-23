@@ -98,7 +98,7 @@ def events_calendar(request, public=True):
         return cached
     cal = vobject.iCalendar()
     cal.add('X-WR-CALNAME').value = ('Air Mozilla Public Events' if public
-                                     else 'Air Mozilla MoCo Events')
+                                     else 'Air Mozilla Private Events')
     now = datetime.datetime.utcnow()
     events = list(Event.objects.approved()
                         .filter(start_time__lt=now, public=public) 
@@ -120,6 +120,8 @@ def events_calendar(request, public=True):
     icalstream = cal.serialize()
     response = http.HttpResponse(icalstream,
                                  mimetype='text/calendar; charset=utf-8')
-    response['Content-Disposition'] = ('inline; filename=AirmozillaEvents.ics')
+    filename = 'AirMozillaEvents%s.ics' % ('Public' if public else 'Private')
+    response['Content-Disposition'] = (
+        'inline; filename=AirmozillaEvents%s.ics' % filename)
     cache.set(cache_key, response)
     return response

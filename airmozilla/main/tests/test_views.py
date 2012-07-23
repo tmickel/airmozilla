@@ -69,5 +69,5 @@ class TestPages(TestCase):
         """Calendars respond successfully."""
         response = self.client.get(reverse('main:calendar'))
         eq_(response.status_code, 200)
-        response = self.client.get(reverse('main:moco_calendar'))
+        response = self.client.get(reverse('main:private_calendar'))
         eq_(response.status_code, 200)
