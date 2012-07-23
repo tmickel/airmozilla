@@ -8,6 +8,7 @@ from django.contrib.sites.models import RequestSite
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.cache import cache
+from django.utils.timezone import utc
 
 from jingo import Template
 
@@ -99,7 +100,7 @@ def events_calendar(request, public=True):
     cal = vobject.iCalendar()
     cal.add('X-WR-CALNAME').value = ('Air Mozilla Public Events' if public
                                      else 'Air Mozilla Private Events')
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.utcnow().replace(tzinfo=utc)
     events = list(Event.objects.approved()
                         .filter(start_time__lt=now, public=public) 
                         .order_by('-start_time')[:settings.CALENDAR_SIZE])
