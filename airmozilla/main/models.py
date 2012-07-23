@@ -192,6 +192,7 @@ class Approval(models.Model):
     approved = models.BooleanField(default=False)
     processed = models.BooleanField(default=False)
     processed_time = models.DateTimeField(auto_now=True)
+    comment = models.TextField(blank=True)
 
 
 @receiver(models.signals.post_save, sender=Event)
