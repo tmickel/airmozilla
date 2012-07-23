@@ -13,7 +13,7 @@ from jinja2 import Environment, meta
 from airmozilla.base.utils import json_view, tz_apply, unique_slugify
 from airmozilla.main.models import (Approval, Category, Event, EventOldSlug,
                                     Participant, Tag, Template)
-from airmozilla.manage.forms import (CategoryForm, GroupEditForm,
+from airmozilla.manage.forms import (ApprovalForm, CategoryForm, GroupEditForm,
                                      EventEditForm, EventFindForm,
                                      EventRequestForm, ParticipantEditForm,
                                      ParticipantFindForm, TemplateEditForm,
@@ -400,10 +400,14 @@ def approval_review(request, id):
     if approval.group not in request.user.groups.all():
         return redirect('manage:approvals')
     if request.method == 'POST':
+        form = ApprovalForm(request.POST, instance=approval)
+        approval = form.save(commit=False)
         approval.approved = 'approve' in request.POST
         approval.processed = True
         approval.user = request.user
         approval.save()
         return redirect('manage:approvals')
+    else:
+        form = ApprovalForm(instance=approval)
     return render(request, 'manage/approval_review.html',
-                  {'approval': approval})
+                  {'approval': approval, 'form': form})

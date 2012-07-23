@@ -3,12 +3,11 @@ import pytz
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.utils.timezone import get_current_timezone_name
 
 from funfactory.urlresolvers import reverse
 
 from airmozilla.base.forms import BaseModelForm
-from airmozilla.main.models import (Category, Event, EventOldSlug,
+from airmozilla.main.models import (Approval, Category, Event, EventOldSlug,
                                     Participant, Tag, Template)
 
 
@@ -165,4 +164,12 @@ class TemplateEditForm(BaseModelForm):
         model = Template
         widgets = {
             'content': forms.Textarea(attrs={'rows': 20})
+        }
+
+class ApprovalForm(BaseModelForm):
+    class Meta:
+        model = Approval
+        fields = ('comment',)
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 3})
         }

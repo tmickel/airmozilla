@@ -53,8 +53,9 @@
         </td>
       </tr>
   </table>
-  <form method="post">
+  <form method="post" class="form-horizontal">
   {{ csrf() }}
+  {{ bootstrapform(form) }}
   <div class="form-actions">
     <button type="submit" class="btn btn-primary btn-large"
             name="approve" id='submit_approve'>

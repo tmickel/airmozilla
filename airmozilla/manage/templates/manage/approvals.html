@@ -46,6 +46,9 @@
         {{ review.user.get_full_name() }} ({{ review.group }})
         <strong>{{ 'approved' if review.approved else 'rejected' }}</strong>
         "{{ review.event.title }}" - {{ review.processed_time|js_date }}
+        {% if review.comment %}
+          - {{ review.comment }}
+        {% endif %}
     </li>
   {% endfor %}
   </ul>
