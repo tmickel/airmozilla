@@ -1,0 +1,29 @@
+{% extends 'manage/participants.html' %}
+
+{% block manage_title %}
+  Emailing participant ({{ participant.name }})
+{% endblock %}
+
+{% block manage_content %}
+  {% if not participant.email %}
+    Please go back and add an email address for this participant.
+  {% else %}
+    You are about to email <strong>{{ participant.name }}</strong> for a
+    profile review.  The message is reproduced below.
+    <div class="well">
+      <p>
+        <strong>To:</strong>
+        {{participant.name }} &lt;{{ participant.email }}&gt;
+      </p>
+      <p><strong>From:</strong> {{ request.user.email }}</p>
+      <p><strong>Subject:</strong> {{ subject }}</p>
+      <hr />
+      <p>{{ message|urlize|nl2br }}</p>
+    </div>
+    <form method="post">
+      {{ csrf() }}
+      {% set submit_text = 'Send email' %}
+      {% include 'manage/_form_buttons.html' %}
+    </form>
+  {% endif %}
+{% endblock %}
