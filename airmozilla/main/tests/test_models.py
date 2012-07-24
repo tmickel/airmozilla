@@ -19,13 +19,13 @@ class ForeignKeyTests(TestCase):
         """Delete an object and ensure it's deleted."""
         model = obj.__class__
         obj.delete()
-        remaining = model.objects.filter(id=obj.id)
+        remaining = model.objects.filter(id=obj.id).exists()
         ok_(not remaining, 'The object was not deleted.  Model: %s' % model)
 
     def _refresh_ok(self, obj, exists=True):
         """Ensure that an object still exists or is gone."""
         model = obj.__class__
-        refresh = model.objects.filter(id=obj.id)
+        refresh = model.objects.filter(id=obj.id).exists()
         if exists:
             ok_(refresh, 'The object no longer exists.  Model: %s' % model)
         else:
