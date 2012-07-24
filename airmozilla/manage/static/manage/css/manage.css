@@ -2,8 +2,13 @@
     background-image: url("../img/glyphicons-halflings.png");
 }
 
+.icon-white {
+    background-image: url("../img/glyphicons-halflings-white.png");
+}
+
 body {
-    padding-top: 15px;
+    padding-top: 50px;
+    overflow: scroll;
 }
 
 ul {
@@ -12,10 +17,6 @@ ul {
 
 div.controls select {
     width: auto;
-}
-
-#logo-img {
-    width: 200px;
 }
 
 #container {
