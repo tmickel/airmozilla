@@ -4,6 +4,7 @@ import vobject
 
 from django import http
 from django.conf import settings
+from django.contrib.sites.models import RequestSite
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.cache import cache
@@ -108,6 +109,8 @@ def events_calendar(request, public=True):
     events += list(Event.objects.approved()
                         .filter(start_time__gte=now, public=public)
                         .order_by('start_time')[:settings.CALENDAR_SIZE])
+    base_url = '%s://%s/' % (request.is_secure() and 'https' or 'http',
+                             RequestSite(request).domain)
     for event in events:
         vevent = cal.add('vevent')
         vevent.add('summary').value = event.title
@@ -116,8 +119,7 @@ def events_calendar(request, public=True):
                                      datetime.timedelta(hours=1))
         vevent.add('description').value = event.description
         vevent.add('location').value = event.location.name
-        vevent.add('url').value = request.build_absolute_uri('/%s/'
-                                                             % event.slug)
+        vevent.add('url').value = base_url + event.slug + '/'
     icalstream = cal.serialize()
     response = http.HttpResponse(icalstream,
                                  mimetype='text/calendar; charset=utf-8')

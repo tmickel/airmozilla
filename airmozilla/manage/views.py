@@ -13,7 +13,7 @@ from django.utils import timezone
 from funfactory.urlresolvers import reverse
 from jinja2 import Environment, meta
 
-from airmozilla.base.utils import (json_view, tz_apply, unique_slugify)
+from airmozilla.base.utils import json_view, tz_apply, unique_slugify
 from airmozilla.main.models import (Approval, Category, Event, EventOldSlug,
                                     Location, Participant, Tag, Template)
 from airmozilla.manage.forms import (ApprovalForm, CategoryForm, GroupEditForm,
