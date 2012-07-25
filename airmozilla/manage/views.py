@@ -321,23 +321,18 @@ def participant_email(request, id):
     from_addr = settings.EMAIL_FROM_ADDRESS
     last_events = (Event.objects.filter(participants=participant)
                         .order_by('-created'))
-    if last_events:
-        last_event = last_events[0]
-        cc_addr = last_event.creator.email
-    else:
-        last_event = None
-        cc_addr = None
+    last_event = last_events[0] if last_events else None
+    cc_addr = last_event.creator.email if last_event else None
     subject = ('Presenter profile on Air Mozilla (%s)' % participant.name)
+    profile_url = request.build_absolute_uri(
+        reverse('main:participant', kwargs={'slug': participant.slug})
+    )
     message = ('A new profile for you will be added to the Air'
                 ' Mozilla website (http://air.mozilla.org) to be shown along'
                 ' with events and presentations you participate in.  Please'
                 ' verify the information posted is correct; if there are any'
                 ' issues or corrections, please let us know'
-                ' (%s).\n\nProfile: %s' % (reply_to,
-                request.build_absolute_uri(
-                    reverse('main:participant',
-                        kwargs={'slug': participant.slug})
-                )))
+                ' (%s).\n\nProfile: %s' % (reply_to, profile_url))
     if request.method == 'POST':
         if 'submit' in request.POST:
             cc = [cc_addr] if (('cc' in request.POST) and cc_addr) else None
