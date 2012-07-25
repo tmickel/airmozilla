@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import (permission_required,
                                             user_passes_test)
 from django.contrib.auth.models import User, Group
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -212,8 +212,9 @@ def event_edit(request, id):
                      request.build_absolute_uri(reverse('manage:approvals')),
                      event.title, event.creator.email, event.start_time,
                      event.description))
-                send_mail(subject, message, settings.EMAIL_FROM_ADDRESS,
-                          emails)
+                email = EmailMessage(subject, message,
+                                     settings.EMAIL_FROM_ADDRESS, emails)
+                email.send()
             for approval in approvals_remove:
                 app = Approval.objects.get(group=approval, event=event)
                 app.delete()
@@ -315,25 +316,41 @@ def participant_edit(request, id):
 @permission_required('change_participant')
 def participant_email(request, id):
     participant = Participant.objects.get(id=id)
+    reply_to = request.user.email
+    to_addr = participant.email
+    from_addr = settings.EMAIL_FROM_ADDRESS
+    last_events = (Event.objects.filter(participants=participant)
+                        .order_by('-created'))
+    if last_events:
+        last_event = last_events[0]
+        cc_addr = last_event.creator.email
+    else:
+        last_event = None
+        cc_addr = None
     subject = ('Presenter profile on Air Mozilla (%s)' % participant.name)
     message = ('A new profile for you will be added to the Air'
                 ' Mozilla website (http://air.mozilla.org) to be shown along'
                 ' with events and presentations you participate in.  Please'
                 ' verify the information posted is correct; if there are any'
                 ' issues or corrections, please let us know'
-                ' (%s).\n\nProfile: %s' % (request.user.email,
+                ' (%s).\n\nProfile: %s' % (reply_to,
                 request.build_absolute_uri(
                     reverse('main:participant',
                         kwargs={'slug': participant.slug})
                 )))
     if request.method == 'POST':
         if 'submit' in request.POST:
-            send_mail(subject, message, request.user.email, [participant.email])
+            cc = [cc_addr] if (('cc' in request.POST) and cc_addr) else None
+            email = EmailMessage(subject, message, from_addr, [to_addr],
+                                 cc=cc, headers={'Reply-To': reply_to})
+            email.send()
         return redirect('manage:participants')
     else:
         return render(request, 'manage/participant_email.html',
                       {'participant': participant, 'message': message,
-                       'subject': subject})
+                       'subject': subject, 'reply_to': reply_to,
+                       'to_addr': to_addr, 'from_addr': from_addr,
+                       'cc_addr': cc_addr, 'last_event': last_event})
 
 
 @staff_required

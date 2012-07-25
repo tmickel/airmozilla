@@ -10,20 +10,28 @@
   {% else %}
     You are about to email <strong>{{ participant.name }}</strong> for a
     profile review.  The message is reproduced below.
-    <div class="well">
-      <p>
-        <strong>To:</strong>
-        {{participant.name }} &lt;{{ participant.email }}&gt;
-      </p>
-      <p><strong>From:</strong> {{ request.user.email }}</p>
-      <p><strong>Subject:</strong> {{ subject }}</p>
-      <hr />
-      <p>{{ message|urlize|nl2br }}</p>
-    </div>
     <form method="post">
-      {{ csrf() }}
-      {% set submit_text = 'Send email' %}
-      {% include 'manage/_form_buttons.html' %}
-    </form>
+      <div class="well">
+        <p>
+          <strong>To:</strong>
+          {{participant.name }} &lt;{{ to_addr }}&gt;
+        </p>
+        <p><strong>From:</strong> {{ from_addr }}</p>
+        <p><strong>Reply-to:</strong> {{ reply_to }}</p>
+        {% if cc_addr %}
+          <p>
+            <input type='checkbox' id='cc' name='cc' checked />
+            <strong>Cc:</strong> {{ cc_addr }} 
+            (creator of "{{ last_event.title }}")
+          </p>
+        {% endif %}
+        <p><strong>Subject:</strong> {{ subject }}</p>
+        <hr />
+        <p>{{ message|urlize|nl2br }}</p>
+      </div>
+        {{ csrf() }}
+        {% set submit_text = 'Send email' %}
+        {% include 'manage/_form_buttons.html' %}
+      </form>
   {% endif %}
 {% endblock %}
