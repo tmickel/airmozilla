@@ -316,9 +316,11 @@ def participant_edit(request, id):
 @permission_required('change_participant')
 def participant_email(request, id):
     participant = Participant.objects.get(id=id)
-    reply_to = request.user.email
     to_addr = participant.email
     from_addr = settings.EMAIL_FROM_ADDRESS
+    reply_to = request.user.email
+    if not reply_to:
+        reply_to = from_addr
     last_events = (Event.objects.filter(participants=participant)
                         .order_by('-created'))
     last_event = last_events[0] if last_events else None
