@@ -1,33 +1,30 @@
 {% extends 'base.html' %}
 {% set page = page|default('home') -%}
 {% set navigation_bar = [
-    ('', 'Management Tools', '', '', True),
-    (url('manage:home'), 'Welcome', 'home', 'icon-home', True),
-    (url('main:home'), 'Air Mozilla Index', '', 'icon-th-list', True),
-    (url('auth:logout'), 'Log Out', '', 'icon-off', True),
+    ('manage:home', 'Dashboard', 'home', 'icon-home', True),
+    ('auth:logout', 'Log Out', '', 'icon-off', True),
 
     ('', 'Users and groups', '', '', perms.change_user),
-    (url('manage:users'), 'Edit users', 'users', 'icon-user',
-     perms.change_user),
-    (url('manage:groups'), 'Group permissions', 'groups', 'icon-lock',
+    ('manage:users', 'Edit users', 'users', 'icon-user', perms.change_user),
+    ('manage:groups', 'Group permissions', 'groups', 'icon-lock',
      perms.change_group),
 
     ('', 'Event configuration', '', '', perms.change_category),
-    (url('manage:categories'), 'Categories', 'categories', 'icon-folder-close',
+    ('manage:categories', 'Categories', 'categories', 'icon-folder-close',
      perms.change_category),
-    (url('manage:locations'), 'Locations', 'locations', 'icon-globe',
+    ('manage:locations', 'Locations', 'locations', 'icon-globe',
      perms.change_location),
-    (url('manage:templates'), 'Video templates', 'templates', 'icon-film',
+    ('manage:templates', 'Video templates', 'templates', 'icon-film',
      perms.change_template),
 
     ('', 'Event Tools', '', '', perms.manage.event_request),
-    (url('manage:event_request'), 'Event request', 'erequest',
-     'icon-calendar', perms.add_event),
-    (url('manage:participants'), 'Participant editor', 'part_edit',
-     'icon-picture', perms.change_participant),
-    (url('manage:approvals'), 'Approval inbox', 'approvals', 'icon-envelope',
+    ('manage:event_request', 'Event request', 'erequest', 'icon-calendar',
+     perms.add_event),
+    ('manage:participants', 'Participant editor', 'part_edit', 'icon-picture',
+     perms.change_participant),
+    ('manage:approvals', 'Approval inbox', 'approvals', 'icon-envelope',
      perms.change_approval),
-    (url('manage:events'), 'Event manager', 'events', 'icon-facetime-video',
+    ('manage:events', 'Event manager', 'events', 'icon-facetime-video',
      perms.change_event)
 ] -%}
 {% block page_title %}
@@ -43,7 +40,7 @@
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
-        <a class="brand" href="/">
+        <a class="brand" href="{{ url('main:home') }}">
         <img id="logo-img" src="{{ static('img/logo-airmo-md.png') }}" alt="Air Mozilla"
              width="100">
         </a>
@@ -56,13 +53,13 @@
        		<div class="row">
             <div id="menu" class="span2">
                 <ul class="nav nav-list">
-					{% for href, title, id, icon, perm in navigation_bar %}
+					{% for view, title, id, icon, perm in navigation_bar %}
 						{% if perm %}
-						{% if href == '' %}
+						{% if view == '' %}
 							<li class="nav-header">{{ title }}</li>
 						{% else %}
 							<li {% if page == id %} class="active" {% endif %}>
-								<a href="{{ href }}">
+								<a href="{{ url(view) }}">
 									<i class="{{ icon }}{% if page == id %} icon-white{% endif %}"></i>
 									{{ title }}
 								</a>
