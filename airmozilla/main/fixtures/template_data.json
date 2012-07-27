@@ -1,0 +1,18 @@
+[
+    {
+        "pk": 1, 
+        "model": "main.template", 
+        "fields": {
+            "content": "<video controls width=\"100%\" controls preload=\"none\" poster=\"https://d3fenhwk93s16g.cloudfront.net/{{ tag }}/poster.jpg\">\n    <source src=\"http://cf.cdn.vid.ly/{{ tag }}/mp4.mp4\" type=\"video/mp4\">\n    <source src=\"http://cf.cdn.vid.ly/{{ tag }}/webm.webm\" type=\"video/webm\"> \n    <source src=\"http://cf.cdn.vid.ly/{{ tag }}/ogv.ogv\" type=\"video/ogg\">\n    <a target=\"_blank\" href=\"http://vid.ly/{{ tag }}\"><img src=\"https://d3fenhwk93s16g.cloudfront.net/{{ tag }}/poster.jpg\" width=\"500\" alt=\"Video\"></a>\n</video>", 
+            "name": "Vid.ly"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "main.template", 
+        "fields": {
+            "content": "<script src=\"//videos-cdn.mozilla.net/serv/air_mozilla/jwplayer.js\"></script>\n<div id=\"player\"></div>\n<script>\n    jwplayer(\"player\").setup({ \n      \"flashplayer\":\"https://videos-cdn.mozilla.net/serv/air_mozilla/player.swf\",\n      \"file\":\"{{ file }}\", \n      \"provider\":\"rtmp\", \n      \"streamer\":\"rtmp://fml.1237.edgecastcdn.net/201237/\", \n      \"rtmp.subscribe\":\"true\", \n      \"controlbar\":\"over\", \n      \"playlist\":\"none\", \n      \"dock\":\"true\", \n      \"icons\":\"true\", \n      \"quality\":\"true\", \n      \"autostart\":\"true\", \n      \"image\":\"https://videos-cdn.mozilla.net/serv/air_mozilla/PleaseStandBy.png\", \n      \"width\":\"620\", \n      \"height\":\"350\" }); \n</script>", 
+            "name": "Edgecast Stream"
+        }
+    }
+]

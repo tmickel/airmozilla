@@ -1,0 +1,18 @@
+[
+    {
+        "pk": 1, 
+        "model": "main.location", 
+        "fields": {
+            "timezone": "US/Pacific", 
+            "name": "Mountain View Ten Forward"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "main.location", 
+        "fields": {
+            "timezone": "US/Pacific", 
+            "name": "San Francisco Commons"
+        }
+    }
+]

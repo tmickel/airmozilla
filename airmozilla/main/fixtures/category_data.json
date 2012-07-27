@@ -1,0 +1,23 @@
+[
+    {
+        "pk": 1, 
+        "model": "main.category", 
+        "fields": {
+            "name": "Internal meetings"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "main.category", 
+        "fields": {
+            "name": "Launch events"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "main.category", 
+        "fields": {
+            "name": "Brownbags"
+        }
+    }
+]
