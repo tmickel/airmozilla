@@ -1,6 +1,8 @@
 from airmozilla.main.models import Approval, Event, Participant
 
 def badges(request):
+    if not request.user.is_active:
+        return {}
     context = {'badges': {}}
     # Event manager badge for unprocessed events
     events = Event.objects.initiated().count()

@@ -17,21 +17,13 @@ from airmozilla.main.models import Event, EventOldSlug, Participant
 
 def page(request, template):
     """Base page:  renders templates bare, used for static pages."""
-    featured = Event.objects.filter(public=True, featured=True)
-    return render(request, template, {'featured': featured})
+    return render(request, template)
 
 
 def home(request, page=1):
     """Paginated recent videos and live videos."""
-    featured_events = Event.objects.filter(public=True, featured=True)
     archived_events = Event.objects.archived().order_by('-archive_time')
     live_events = Event.objects.live().order_by('start_time')
-    upcoming_events = Event.objects.upcoming().order_by('start_time')
-    if not request.user.is_active:
-        archived_events = archived_events.filter(public=True)
-        live_events = live_events.filter(public=True)
-        upcoming_events = upcoming_events.filter(public=True)
-    upcoming_events = upcoming_events[:3]
     paginate = Paginator(archived_events, 10)
     try:
         archived_paged = paginate.page(page)
@@ -43,8 +35,6 @@ def home(request, page=1):
         live, also_live = live_events[0], live_events[1:]
     return render(request, 'main/home.html', {
         'events': archived_paged,
-        'featured': featured_events,
-        'upcoming': upcoming_events,
         'live': live,
         'also_live': also_live
     })
@@ -52,7 +42,6 @@ def home(request, page=1):
 
 def event(request, slug):
     """Video, description, and other metadata."""
-    featured = Event.objects.filter(public=True, featured=True)
     try:
         event = Event.objects.get(slug=slug)
     except Event.DoesNotExist:
@@ -80,17 +69,14 @@ def event(request, slug):
         'event': event,
         'video': template_tagged,
         'participants': participants,
-        'featured': featured,
     })
 
 
 def participant(request, slug):
     """Individual participant/speaker profile."""
     participant = get_object_or_404(Participant, slug=slug)
-    featured = Event.objects.filter(public=True, featured=True)
     return render(request, 'main/participant.html', {
         'participant': participant,
-        'featured': featured
     })
 
 
