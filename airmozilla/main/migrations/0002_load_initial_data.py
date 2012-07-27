@@ -14,7 +14,6 @@ class Migration(DataMigration):
         call_command("loaddata", "template_data.json")
 
     def backwards(self, orm):
-        "Write your backwards methods here."
         raise RuntimeError("Cannot reverse this migration.")
 
     models = {
