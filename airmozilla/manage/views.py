@@ -62,6 +62,8 @@ def user_edit(request, id):
     """Editing an individual user."""
     user = User.objects.get(id=id)
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:users')
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
@@ -85,6 +87,8 @@ def group_edit(request, id):
     """Edit an individual group."""
     group = Group.objects.get(id=id)
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:groups')
         form = GroupEditForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
@@ -115,6 +119,8 @@ def group_new(request):
 def event_request(request):
     """Event request page:  create new events to be published."""
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:home')
         form = EventRequestForm(request.POST, request.FILES, instance=Event())
         if form.is_valid():
             event = form.save(commit=False)
@@ -178,6 +184,8 @@ def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:events')
         old_slug = event.slug
         form = EventEditForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
@@ -295,6 +303,8 @@ def participant_edit(request, id):
     """ Participant edit page:  update biographical info. """
     participant = Participant.objects.get(id=id)
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:participants')
         form = ParticipantEditForm(request.POST, request.FILES,
                                    instance=participant)
         if form.is_valid():
@@ -354,6 +364,8 @@ def participant_email(request, id):
 @permission_required('add_participant')
 def participant_new(request):
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:participants')
         form = ParticipantEditForm(request.POST, request.FILES,
                                    instance=Participant())
         if form.is_valid():
@@ -409,6 +421,8 @@ def templates(request):
 def template_edit(request, id):
     template = Template.objects.get(id=id)
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:templates')
         form = TemplateEditForm(request.POST, instance=template)
         if form.is_valid():
             form.save()
@@ -423,6 +437,8 @@ def template_edit(request, id):
 @permission_required('add_template')
 def template_new(request):
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:templates')
         form = TemplateEditForm(request.POST, instance=Template())
         if form.is_valid():
             form.save()
@@ -453,6 +469,8 @@ def locations(request):
 def location_edit(request, id):
     location = Location.objects.get(id=id)
     if request.method == 'POST':
+        if 'cancel' in request.POST:
+            return redirect('manage:locations')
         form = LocationEditForm(request.POST, instance=location)
         if form.is_valid():
             form.save()
