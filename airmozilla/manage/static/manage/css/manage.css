@@ -33,6 +33,11 @@ div.controls select {
     display: inline;
 }
 
+/* management menu badges */
+ul.nav .badge {
+    float: right;
+}
+
 /* Required forms get red star */
 
 div.control-group label:after {

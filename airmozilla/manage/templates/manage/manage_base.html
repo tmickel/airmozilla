@@ -20,7 +20,7 @@
     ('', 'Event Tools', '', '', perms.manage.event_request),
     ('manage:event_request', 'Event request', 'erequest', 'icon-calendar',
      perms.add_event),
-    ('manage:participants', 'Participant editor', 'part_edit', 'icon-picture',
+    ('manage:participants', 'Participants', 'part_edit', 'icon-picture',
      perms.change_participant),
     ('manage:approvals', 'Approval inbox', 'approvals', 'icon-envelope',
      perms.change_approval),
@@ -62,6 +62,11 @@
 								<a href="{{ url(view) }}">
 									<i class="{{ icon }}{% if page == id %} icon-white{% endif %}"></i>
 									{{ title }}
+                  {% if id in badges %}
+                    <span class="badge badge-
+                      {%- if page != id %}important{% else %}inverse{% endif %}">
+                    {{- badges[id] }}</span>
+                  {% endif %}
 								</a>
 							</li>
 						{% endif %}
