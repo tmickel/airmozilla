@@ -17,8 +17,7 @@ TIMEZONE_CHOICES = [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones]
 class UserEditForm(BaseModelForm):
     class Meta:
         model = User
-        fields = ('is_active', 'is_staff', 'is_superuser',
-                  'groups', 'user_permissions')
+        fields = ('is_active', 'is_staff', 'is_superuser', 'groups')
 
 
 class GroupEditForm(BaseModelForm):
@@ -52,7 +51,7 @@ class EventRequestForm(BaseModelForm):
     tags = forms.CharField()
     participants = forms.CharField()
     timezone = forms.ChoiceField(choices=TIMEZONE_CHOICES,
-                     initial=settings.TIME_ZONE)
+                     initial=settings.TIME_ZONE, label='Time zone')
     def __init__(self, *args, **kwargs):
         super(EventRequestForm, self).__init__(*args, **kwargs)
         self.fields['participants'].help_text = (
@@ -65,6 +64,7 @@ class EventRequestForm(BaseModelForm):
             '<i class="icon-plus-sign"></i>'
             'New location'
             '</a>' % reverse('manage:location_new'))
+        self.fields['placeholder_img'].label = 'Placeholder image'
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']
@@ -105,9 +105,9 @@ class EventRequestForm(BaseModelForm):
             'start_time': forms.DateTimeInput(format='%Y-%m-%d %H:%M'),
             'archive_time': forms.DateTimeInput(format='%Y-%m-%d %H:%M'),
         }
-        exclude = ('featured', 'status', 'archive_time')
+        exclude = ('featured', 'status', 'archive_time', 'slug')
         # Fields specified to enforce order
-        fields = ('title', 'slug', 'placeholder_img', 'description',
+        fields = ('title', 'placeholder_img', 'description',
         'short_description', 'location', 'start_time', 'timezone',
         'participants', 'category', 'tags', 'call_info', 'additional_links',
         'public')

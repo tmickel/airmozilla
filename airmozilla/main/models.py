@@ -164,9 +164,9 @@ class Event(models.Model):
                               default=STATUS_INITIATED)
     placeholder_img = ImageField(upload_to=_upload_path('event-placeholder'))
     description = models.TextField()
-    short_description = models.TextField(blank=True, help_text='Optional: ' +
-                        'if not provided, this will be filled in by the ' +
-                        'first words of the full description.')
+    short_description = models.TextField(blank=True, help_text='If not ' +
+                        'provided, this will be filled in by the first ' +
+                        'words of the full description.')
     start_time = models.DateTimeField()
     archive_time = models.DateTimeField(blank=True, null=True)
     participants = models.ManyToManyField(Participant,
