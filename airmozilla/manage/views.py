@@ -260,11 +260,17 @@ def participants(request):
         else:
             participants = Participant.objects.all()
     else:
-        participants = Participant.objects.all()
+        participants = Participant.objects.exclude(
+            cleared=Participant.CLEARED_NO
+        )
         search_form = forms.ParticipantFindForm()
+    participants_not_clear = Participant.objects.filter(
+        cleared=Participant.CLEARED_NO
+    )
     participants_paged = paginate(participants, request.GET.get('page'), 10)
     return render(request, 'manage/participants.html',
-                  {'paginate': participants_paged, 'form': search_form})
+                  {'paginate': participants_paged, 'form': search_form,
+                   'participants_not_clear': participants_not_clear})
 
 
 @staff_required

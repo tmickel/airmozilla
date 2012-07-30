@@ -74,15 +74,15 @@
     {{ event_table('Search results', search_results) }}
   {% else %}
     {% if paginate.number == 1 %}
+      {% if initiated %}
+        {{ event_table('Initiated events, need approval', initiated, True) }}
+      {% endif %}
       {% if live %}
         {{ event_table('Live events', live, False, True) }}
       {% endif %}
       {% if archiving %}
         {{ event_table('Archiving events', archiving, True) }}
-      {% endif %}
-      {% if initiated %}
-        {{ event_table('Initiated events, need approval', initiated, True) }}
-      {% endif %}
+      {% endif %} 
       {% if upcoming %}
         {{ event_table('Upcoming events', upcoming) }}
       {% endif %}
