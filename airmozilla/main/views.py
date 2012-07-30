@@ -5,7 +5,6 @@ import vobject
 from django import http
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
-from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.cache import cache
 from django.utils.timezone import utc
@@ -13,6 +12,7 @@ from django.utils.timezone import utc
 from jingo import Template
 
 from airmozilla.main.models import Event, EventOldSlug, Participant
+from airmozilla.base.utils import paginate
 
 
 def page(request, template):
@@ -24,11 +24,7 @@ def home(request, page=1):
     """Paginated recent videos and live videos."""
     archived_events = Event.objects.archived().order_by('-archive_time')
     live_events = Event.objects.live().order_by('start_time')
-    paginate = Paginator(archived_events, 10)
-    try:
-        archived_paged = paginate.page(page)
-    except EmptyPage:
-        archived_paged = paginate.page(paginate.num_pages)
+    archived_paged = paginate(archived_events, page, 10)
     live = None
     also_live = []
     if live_events:
