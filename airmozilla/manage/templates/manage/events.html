@@ -39,7 +39,9 @@
           {% if event.archive_time %}
             {{ event.archive_time|js_date }}
           {% else %}
-            Not archived
+            <a href="{{ url('manage:event_archive', event.id) }}" class="btn">
+              <i class="icon-time"></i> Archive
+            </a>
           {% endif %}
         </td>
         <td>{{ event.category }}</td>
@@ -60,7 +62,7 @@
         </td>
         <td>
           <a href="{{ url('manage:event_edit', event.id) }}" class="btn">
-            <i class="icon-edit"></i>Edit
+            <i class="icon-edit"></i> Edit
           </a>
         </td>
       </tr>

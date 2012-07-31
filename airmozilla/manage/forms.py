@@ -123,13 +123,27 @@ class EventEditForm(EventRequestForm):
         approvals = kwargs['instance'].approval_set.all()
         self.fields['approvals'].initial = [app.group for app in approvals]
     class Meta(EventRequestForm.Meta):
-        exclude = ()
+        exclude = ('archive_time')
         # Fields specified to enforce order
         fields = ('title', 'slug', 'status', 'public', 'featured', 'template',
         'template_environment', 'placeholder_img', 'location', 'description',
         'short_description', 'start_time', 'archive_time', 'timezone',
         'participants', 'category', 'tags', 'call_info', 'additional_links',
         'approvals')
+
+
+class EventArchiveForm(BaseModelForm):
+    archive_time = forms.IntegerField()
+    def __init__(self, *args, **kwargs):
+        super(EventArchiveForm, self).__init__(*args, **kwargs)
+        self.fields['archive_time'].help_text = (
+            '<div id="archive_time_slider"></div>'
+        )
+        self.fields['archive_time'].initial
+    
+    class Meta(EventRequestForm.Meta):
+        exclude = ()
+        fields = ('template', 'template_environment')
 
 
 class EventFindForm(BaseModelForm):

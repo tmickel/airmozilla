@@ -135,7 +135,7 @@ class EventManager(models.Manager):
     def archiving(self):
         return self.approved().filter(
             archive_time__gt=self._get_now(),
-            start_time__lt=self._get_now()
+            start_time__lt=self._get_live_time()
         )
 
     def archived(self):

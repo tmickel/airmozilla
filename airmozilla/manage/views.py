@@ -1,3 +1,4 @@
+import datetime
 import pytz
 import re
 
@@ -245,6 +246,24 @@ def participant_autocomplete(request):
     participant_names = [{'id': p.name, 'text': p.name}
                          for p in participants if regex.findall(p.name)]
     return {'participants': participant_names[:5]}
+
+
+@staff_required
+@permission_required('change_event')
+def event_archive(request, id):
+    """Dedicated page for setting page template (archive) and archive time."""
+    event = Event.objects.get(id=id)
+
+    def pre_save_event_archive(event, form):
+        minutes = form.cleaned_data['archive_time']
+        event.archive_time = (
+            event.start_time + datetime.timedelta(minutes=minutes)
+        )
+        return event
+
+    return _process_form(request, forms.EventArchiveForm, event,
+                         'manage/event_archive.html', 'manage:events',
+                         pre_save_event_archive)
 
 
 @staff_required
