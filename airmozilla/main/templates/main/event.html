@@ -28,7 +28,9 @@
           {% endfor %}
           &bull;
         {% endif %}
-        {{ _('Location') }}: {{ event.location.name }}
+        {% if event.location %}
+          {{ _('Location') }}: {{ event.location.name }}
+        {% endif %}
       </p>
     </header>
     <div class="entry-content">
