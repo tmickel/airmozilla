@@ -58,6 +58,9 @@ class Participant(models.Model):
     )
     cleared = models.CharField(max_length=15,
                                choices=CLEARED_CHOICES, default=CLEARED_NO)
+    
+    def is_clear(self):
+        return self.cleared == Participant.CLEARED_YES
 
     def __unicode__(self):
         return self.name

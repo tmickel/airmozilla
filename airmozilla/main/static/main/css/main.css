@@ -228,6 +228,11 @@ label .note { color: #afb6bb; }
 .entry-posted .posted-date { display: inline; font-size: 1em; line-height: normal; }
 .entry-posted .posted-year { display: inline; font-size: 1em; }
 
+/*** Featuring text for Participants */
+.featuring {
+    font-style: italic;
+}
+
 /*** Timeago dotted underline */
 time.timeago {
     border-bottom: 1px dotted #b4b4b4;
