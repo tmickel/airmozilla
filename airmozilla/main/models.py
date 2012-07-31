@@ -114,8 +114,6 @@ def _get_live_time():
 
 
 class EventManager(models.Manager):
-    
-
     def initiated(self):
         return (self.get_query_set().filter(Q(status=Event.STATUS_INITIATED) |
                                             Q(approval__approved=False) |
