@@ -22,7 +22,7 @@ staff_required = user_passes_test(lambda u: u.is_staff)
 
 
 def _process_form(request, form_class, instance, template, redirect_view,
-                  pre_save=None, render_form=None):
+                  pre_save=None, render_form=None, redirect_data={}):
     """Returns a page response for boilerplate Django model form processing.
        If a form is successful, the instance is updated appropriately.
        pre_save(instance, form) and render_form(form) are optional callbacks
@@ -30,7 +30,7 @@ def _process_form(request, form_class, instance, template, redirect_view,
        rendering.  Callbacks return the modified object (instance or form)."""
     if request.method == 'POST':
         if 'cancel' in request.POST:
-            return redirect(redirect_view)
+            return redirect(redirect_view, **redirect_data)
         form = form_class(request.POST, request.FILES or None,
                           instance=instance)
         if form.is_valid():
@@ -41,7 +41,7 @@ def _process_form(request, form_class, instance, template, redirect_view,
                 form.save_m2m()
             else:
                 form.save()
-            return redirect(redirect_view)
+            return redirect(redirect_view, **redirect_data)
     else:
         form = form_class(instance=instance)
     if render_form:
@@ -299,8 +299,10 @@ def participant_edit(request, id):
     participant = Participant.objects.get(id=id)
     if 'sendmail' in request.POST:
         redirect_view = 'manage:participant_email'
+        redirect_data = {'id': participant.id}
     else:
         redirect_view = 'manage:participants'
+        redirect_data = {}
 
     def pre_save_participant_edit(participant, form):
         if not participant.slug:
@@ -308,7 +310,8 @@ def participant_edit(request, id):
         return participant
     return _process_form(request, forms.ParticipantEditForm, participant,
                          'manage/participant_edit.html', redirect_view,
-                         pre_save_participant_edit)
+                         pre_save_participant_edit,
+                         redirect_data=redirect_data)
 
 
 @staff_required
