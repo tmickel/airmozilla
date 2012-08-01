@@ -123,7 +123,7 @@ class EventEditForm(EventRequestForm):
         approvals = kwargs['instance'].approval_set.all()
         self.fields['approvals'].initial = [app.group for app in approvals]
     class Meta(EventRequestForm.Meta):
-        exclude = ('archive_time')
+        exclude = ('archive_time',)
         # Fields specified to enforce order
         fields = ('title', 'slug', 'status', 'public', 'featured', 'template',
         'template_environment', 'placeholder_img', 'location', 'description',
