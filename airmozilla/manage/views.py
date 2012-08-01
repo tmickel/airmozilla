@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import (permission_required,
 from django.contrib.auth.models import User, Group
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from funfactory.urlresolvers import reverse
@@ -186,17 +187,19 @@ def event_edit(request, id):
             emails = [u.email for u in group.user_set.all()]
             subject = ('[Air Mozilla] Approval requested: "%s"' %
                        event.title)
-            message = ('A new event has been created that requires'
-                       ' approval from someone in your group (%s). Please log'
-                       ' in to the Air Mozilla management page (%s) to review'
-                       ' the request.\n\nTitle: %s\nCreator: %s\nDate and time'
-                       ': %s\n Description: %s' %
-                       (group.name,
-                        request.build_absolute_uri(
-                            reverse('manage:approvals')
-                        ),
-                        event.title, event.creator.email, event.start_time,
-                        event.description))
+            message = render_to_string(
+                'manage/_email_approval.html',
+                {
+                    'group': group.name,
+                    'manage_url': request.build_absolute_uri(
+                        reverse('manage:approvals')
+                    ),
+                    'title': event.title,
+                    'creator': event.creator.email,
+                    'datetime': event.start_time,
+                    'description': event.description
+                }
+            )
             email = EmailMessage(subject, message,
                                  settings.EMAIL_FROM_ADDRESS, emails)
             email.send()
@@ -331,12 +334,13 @@ def participant_email(request, id):
     profile_url = request.build_absolute_uri(
         reverse('main:participant', kwargs={'slug': participant.slug})
     )
-    message = ('A new profile for you will be added to the Air'
-               ' Mozilla website (http://air.mozilla.org) to be shown along'
-               ' with events and presentations you participate in.  Please'
-               ' verify the information posted is correct; if there are any'
-               ' issues or corrections, please let us know'
-               ' (%s).\n\nProfile: %s' % (reply_to, profile_url))
+    message = render_to_string(
+        'manage/_email_participant.html',
+        {
+            'reply_to': reply_to,
+            'link': profile_url
+        }
+    )
     if request.method == 'POST':
         if 'submit' in request.POST:
             cc = [cc_addr] if (('cc' in request.POST) and cc_addr) else None
