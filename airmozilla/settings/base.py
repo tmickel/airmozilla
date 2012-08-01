@@ -109,3 +109,6 @@ CALENDAR_SIZE = 30
 
 # Use PNG for thumbnailing
 THUMBNAIL_FORMAT = 'PNG'
+
+# Number of upcoming events to display in the sidebar
+UPCOMING_SIDEBAR_COUNT = 3
