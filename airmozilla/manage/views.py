@@ -15,9 +15,9 @@ from django.utils import timezone
 from funfactory.urlresolvers import reverse
 from jinja2 import Environment, meta
 
-from airmozilla.base.utils import json_view, paginate, tz_apply, unique_slugify
-from airmozilla.main.models import (Approval, Category, Event, EventOldSlug,
-                                    Location, Participant, Tag, Template)
+from airmozilla.base.utils import json_view, paginate, tz_apply
+from airmozilla.main.models import (Approval, Category, Event, Location,
+                                    Participant, Tag, Template)
 from airmozilla.manage import forms
 
 
@@ -123,9 +123,6 @@ def event_request(request):
         form = forms.EventRequestForm(request.POST, request.FILES, instance=Event())
         if form.is_valid():
             event = form.save(commit=False)
-            if not event.slug:
-                event.slug = unique_slugify(event.title, [Event, EventOldSlug],
-                    event.start_time.strftime('%Y%m%d'))
             tz = pytz.timezone(request.POST['timezone'])
             event.start_time = tz_apply(event.start_time, tz)
             if event.archive_time:
@@ -177,16 +174,9 @@ def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
     if request.method == 'POST':
-        old_slug = event.slug
         form = forms.EventEditForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
             event = form.save(commit=False)
-            if not event.slug:
-                event.slug = unique_slugify(event.title,
-                    [Event, EventOldSlug],
-                    event.start_time.strftime('%Y%m%d'))
-            if event.slug != old_slug:
-                EventOldSlug.objects.create(slug=old_slug, event=event)
             tz = pytz.timezone(request.POST['timezone'])
             event.start_time = tz_apply(event.start_time, tz)
             if event.archive_time:
@@ -325,11 +315,7 @@ def participant_edit(request, id):
         form = forms.ParticipantEditForm(request.POST, request.FILES,
                                    instance=participant)
         if form.is_valid():
-            participant = form.save(commit=False)
-            if not participant.slug:
-                participant.slug = unique_slugify(participant.name,
-                                                  [Participant])
-            participant.save()
+            form.save()
             if 'sendmail' in request.POST:
                 return redirect('manage:participant_email', id=participant.id)
             return redirect('manage:participants')
@@ -387,11 +373,7 @@ def participant_new(request):
         form = forms.ParticipantEditForm(request.POST, request.FILES,
                                    instance=Participant())
         if form.is_valid():
-            participant = form.save(commit=False)
-            if not participant.slug:
-                participant.slug = unique_slugify(participant.name,
-                                                  [Participant])
-            participant.save()
+            form.save()
             return redirect('manage:participants')
     else:
         form = forms.ParticipantEditForm()

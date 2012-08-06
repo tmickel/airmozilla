@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.timezone import utc
 
+from airmozilla.base.utils import unique_slugify
 from airmozilla.main.fields import EnvironmentField
 from sorl.thumbnail import ImageField
 
@@ -217,3 +218,23 @@ def event_clear_cache(sender, **kwargs):
     cache.delete('calendar_public')
     cache.delete('calendar_private')
 
+
+@receiver(models.signals.pre_save, sender=Event)
+def event_update_slug(sender, instance, raw, *args, **kwargs):
+    if raw:
+        return
+    if not instance.slug:
+        instance.slug = unique_slugify(instance.title, [Event, EventOldSlug],
+                                    instance.start_time.strftime('%Y%m%d'))
+    try:
+        old = Event.objects.get(id=instance.id)
+        if instance.slug != old.slug:
+            EventOldSlug.objects.create(slug=old.slug, event=instance)
+    except Event.DoesNotExist:
+        pass
+
+
+@receiver(models.signals.pre_save, sender=Participant)
+def participant_update_slug(sender, instance, raw, *args, **kwargs):
+    if not raw and not instance.slug:
+        instance.slug = unique_slugify(instance.name, [Participant])
