@@ -157,11 +157,12 @@ legend { color: #b4b4b4; } /* For IE */
 .widget_nav_menu li, .widget_categories li { border-bottom-color: #48585e; }
 
 .more-posts .hentry { position: relative; border-bottom: 1px dotted #48585e; margin-bottom: 10px; padding: 0 0 10px 0; clear: both; }
-.more-posts .hentry .entry-title { font-size: 1.125em; letter-spacing: 0; margin: 0 0 .25em; color: #1e77bb; }
+.more-posts .hentry .entry-title { font-size: 1em; letter-spacing: 0; margin: 0 0 .25em; color: #1e77bb; }
 .more-posts .event-date { margin: 0 0 .5em; }
 .more-posts .entry-summary { font-size: .857em; line-height: 1.3; margin: 0; padding: 0; min-height: 0; }
+.more-posts .entry-summary a { color: rgb(220, 220, 220); }
 
-.more-posts .video-thumb { display: block; height: 80px; overflow: hidden; border: 1px solid; margin: 0 0 .25em; }
+.more-posts .video-thumb { display: block; float:right; overflow: hidden; /*border: 1px solid;*/ margin: 0 0 .25em; }
 
 #current-time { padding: 10px; background: hsla(200,30%,10%,.2); text-align: center; margin: -10px -10px 1.5em; box-shadow: inset 0 0 2px rgba(0,0,0,.1); }
 #current-time .widget-title { font-size: 1.125em; margin: 0 0 .25em; }
@@ -259,6 +260,10 @@ span.tag {
 .entry-content img {
     float: left;
     margin-right: 15px;
+}
+
+.participant-profile p {
+    margin: 0 0 .4em;
 }
 
 
