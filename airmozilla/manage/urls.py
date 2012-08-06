@@ -4,7 +4,7 @@ from . import views
 
 
 urlpatterns = patterns('',
-    url(r'^/?$', views.home, name='home'),
+    url(r'^/?$', views.dashboard, name='home'),
     url(r'^users/(?P<id>\d+)/$', views.user_edit, name='user_edit'),
     url(r'^users/', views.users, name='users'),
     url(r'^groups/(?P<id>\d+)/$', views.group_edit, name='group_edit'),

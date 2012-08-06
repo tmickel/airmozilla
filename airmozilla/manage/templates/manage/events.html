@@ -75,6 +75,7 @@
   {% if search_results %}
     {{ event_table('Search results', search_results) }}
   {% else %}
+    {% set paginate = archived %}
     {% if paginate.number == 1 %}
       {% if initiated %}
         {{ event_table('Initiated events, need approval', initiated, True) }}
@@ -89,7 +90,7 @@
         {{ event_table('Upcoming events', upcoming) }}
       {% endif %}
     {% endif %}
-    {{ event_table('Archived events', paginate) }}
+    {{ event_table('Archived events', archived) }}
     {% include 'manage/_paginate.html' %}
   {% endif %}
   <p>

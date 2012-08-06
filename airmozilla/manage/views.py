@@ -1,4 +1,5 @@
 import datetime
+import functools
 import pytz
 import re
 
@@ -19,41 +20,26 @@ from airmozilla.main.models import (Approval, Category, Event, EventOldSlug,
                                     Location, Participant, Tag, Template)
 from airmozilla.manage import forms
 
+
 staff_required = user_passes_test(lambda u: u.is_staff)
 
 
-def _process_form(request, form_class, instance, template, redirect_view,
-                  pre_save=None, render_form=None, redirect_data={}):
-    """Returns a page response for boilerplate Django model form processing.
-       If a form is successful, the instance is updated appropriately.
-       pre_save(instance, form) and render_form(form) are optional callbacks
-       to modify the instance before submission and modify the form before
-       rendering.  Callbacks return the modified object (instance or form)."""
-    if request.method == 'POST':
-        if 'cancel' in request.POST:
-            return redirect(redirect_view, **redirect_data)
-        form = form_class(request.POST, request.FILES or None,
-                          instance=instance)
-        if form.is_valid():
-            if pre_save:
-                pre_instance = form.save(commit=False)
-                pre_instance = pre_save(pre_instance, form)
-                pre_instance.save()
-                form.save_m2m()
-            else:
-                form.save()
-            return redirect(redirect_view, **redirect_data)
-    else:
-        form = form_class(instance=instance)
-    if render_form:
-        form = render_form(form)
-    return render(request, template, {'form': form, 'instance': instance})
+def cancel_redirect(redirect_view):
+    """Redirect wrapper for POST requests which contain a cancel field."""
+    def inner_render(fn):
+        @functools.wraps(fn)
+        def wrapped(request, *args, **kwargs):
+            if request.method == 'POST' and 'cancel' in request.POST:
+                return redirect(reverse(redirect_view))
+            return fn(request, *args, **kwargs)
+        return wrapped
+    return inner_render
 
 
 @staff_required
-def home(request):
-    """Management home page / explanation page."""
-    return render(request, 'manage/home.html')
+def dashboard(request):
+    """Management home / explanation page."""
+    return render(request, 'manage/dashboard.html')
 
 
 @staff_required
@@ -74,11 +60,18 @@ def users(request):
 
 @staff_required
 @permission_required('change_user')
+@cancel_redirect('manage:users')
 def user_edit(request, id):
     """Editing an individual user."""
     user = User.objects.get(id=id)
-    return _process_form(request, forms.UserEditForm, user,
-                         'manage/user_edit.html', 'manage:users')
+    if request.method == 'POST':
+        form = forms.UserEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:users')
+    else:
+        form = forms.UserEditForm(instance=user)
+    return render(request, 'manage/user_edit.html', {'form': form, 'user': user})
 
 
 @staff_required
@@ -91,11 +84,19 @@ def groups(request):
 
 @staff_required
 @permission_required('change_group')
+@cancel_redirect('manage:groups')
 def group_edit(request, id):
     """Edit an individual group."""
     group = Group.objects.get(id=id)
-    return _process_form(request, forms.GroupEditForm, group,
-                         'manage/group_edit.html', 'manage:groups')
+    if request.method == 'POST':
+        form = forms.GroupEditForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:groups')
+    else:
+        form = forms.GroupEditForm(instance=group)
+    return render(request, 'manage/group_edit.html',
+                  {'form': form, 'group': group})
 
 
 @staff_required
@@ -103,29 +104,40 @@ def group_edit(request, id):
 def group_new(request):
     """Add a new group."""
     group = Group()
-    return _process_form(request, forms.GroupEditForm, group,
-                         'manage/group_new.html', 'manage:groups')
+    if request.method == 'POST':
+        form = forms.GroupEditForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:groups')
+    else:
+        form = forms.GroupEditForm(instance=group)
+    return render(request, 'manage/group_new.html', {'form': form})
 
 
 @staff_required
 @permission_required('add_event')
+@cancel_redirect('manage:home')
 def event_request(request):
     """Event request page:  create new events to be published."""
-    def pre_save_event_request(event, form):
-        if not event.slug:
-            event.slug = unique_slugify(event.title, [Event, EventOldSlug],
-                                        event.start_time.strftime('%Y%m%d'))
-        tz = pytz.timezone(request.POST['timezone'])
-        event.start_time = tz_apply(event.start_time, tz)
-        if event.archive_time:
-            event.archive_time = tz_apply(event.archive_time, tz)
-        event.creator = request.user
-        event.modified_user = request.user
-        return event
-    instance = Event() if request.method == 'POST' else None
-    return _process_form(request, forms.EventRequestForm, instance,
-                         'manage/event_request.html', 'manage:home',
-                         pre_save_event_request)
+    if request.method == 'POST':
+        form = forms.EventRequestForm(request.POST, request.FILES, instance=Event())
+        if form.is_valid():
+            event = form.save(commit=False)
+            if not event.slug:
+                event.slug = unique_slugify(event.title, [Event, EventOldSlug],
+                    event.start_time.strftime('%Y%m%d'))
+            tz = pytz.timezone(request.POST['timezone'])
+            event.start_time = tz_apply(event.start_time, tz)
+            if event.archive_time:
+                event.archive_time = tz_apply(event.archive_time, tz)
+            event.creator = request.user
+            event.modified_user = request.user
+            event.save()
+            form.save_m2m()
+            return redirect('manage:home')
+    else:
+        form = forms.EventRequestForm()
+    return render(request, 'manage/event_request.html', {'form': form})
 
 
 @staff_required
@@ -137,8 +149,8 @@ def events(request):
         search_form = forms.EventFindForm(request.POST)
         if search_form.is_valid():
             search_results = Event.objects.filter(
-                title__icontains=search_form.cleaned_data['title']
-            ).order_by('-start_time')
+                             title__icontains=search_form.cleaned_data['title']
+                             ).order_by('-start_time')
     else:
         search_form = forms.EventFindForm()
     initiated = Event.objects.initiated().order_by('start_time')
@@ -152,7 +164,7 @@ def events(request):
         'upcoming': upcoming,
         'live': live,
         'archiving': archiving,
-        'paginate': archived_paged,
+        'archived': archived_paged,
         'form': search_form,
         'search_results': search_results
     })
@@ -160,75 +172,78 @@ def events(request):
 
 @staff_required
 @permission_required('change_event')
+@cancel_redirect('manage:events')
 def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
-    old_slug = event.slug
-
-    def pre_save_event_edit(event, form):
-        if not event.slug:
-            event.slug = unique_slugify(event.title,
-                                        [Event, EventOldSlug],
-                                        event.start_time.strftime('%Y%m%d'))
-        if event.slug != old_slug:
-            EventOldSlug.objects.create(slug=old_slug, event=event)
-        tz = pytz.timezone(request.POST['timezone'])
-        event.start_time = tz_apply(event.start_time, tz)
-        if event.archive_time:
-            event.archive_time = tz_apply(event.archive_time, tz)
-        approvals_old = [app.group for app in event.approval_set.all()]
-        approvals_new = form.cleaned_data['approvals']
-        approvals_add = set(approvals_new).difference(approvals_old)
-        approvals_remove = set(approvals_old).difference(approvals_new)
-        for approval in approvals_add:
-            group = Group.objects.get(name=approval)
-            app = Approval(group=group, event=event)
-            app.save()
-            emails = [u.email for u in group.user_set.all()]
-            subject = ('[Air Mozilla] Approval requested: "%s"' %
-                       event.title)
-            message = render_to_string(
+    if request.method == 'POST':
+        old_slug = event.slug
+        form = forms.EventEditForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            event = form.save(commit=False)
+            if not event.slug:
+                event.slug = unique_slugify(event.title,
+                    [Event, EventOldSlug],
+                    event.start_time.strftime('%Y%m%d'))
+            if event.slug != old_slug:
+                EventOldSlug.objects.create(slug=old_slug, event=event)
+            tz = pytz.timezone(request.POST['timezone'])
+            event.start_time = tz_apply(event.start_time, tz)
+            if event.archive_time:
+                event.archive_time = tz_apply(event.archive_time, tz)
+            approvals_old = [app.group for app in event.approval_set.all()]
+            approvals_new = form.cleaned_data['approvals']
+            approvals_add = set(approvals_new).difference(approvals_old)
+            approvals_remove = set(approvals_old).difference(approvals_new)
+            for approval in approvals_add:
+                group = Group.objects.get(name=approval)
+                app = Approval(group=group, event=event)
+                app.save()
+                emails = [u.email for u in group.user_set.all()]
+                subject = ('[Air Mozilla] Approval requested: "%s"' %
+                           event.title)
+                message = render_to_string(
                 'manage/_email_approval.html',
-                {
-                    'group': group.name,
-                    'manage_url': request.build_absolute_uri(
-                        reverse('manage:approvals')
-                    ),
-                    'title': event.title,
-                    'creator': event.creator.email,
-                    'datetime': event.start_time,
-                    'description': event.description
-                }
-            )
-            email = EmailMessage(subject, message,
-                                 settings.EMAIL_FROM_ADDRESS, emails)
-            email.send()
-        for approval in approvals_remove:
-            app = Approval.objects.get(group=approval, event=event)
-            app.delete()
-        event.modified_user = request.user
-        return event
-
-    def render_form_event_edit(form):
+                    {
+                        'group': group.name,
+                        'manage_url': request.build_absolute_uri(
+                            reverse('manage:approvals')
+                        ),
+                        'title': event.title,
+                        'creator': event.creator.email,
+                        'datetime': event.start_time,
+                        'description': event.description
+                    }
+                )
+                email = EmailMessage(subject, message,
+                                     settings.EMAIL_FROM_ADDRESS, emails)
+                email.send()
+            for approval in approvals_remove:
+                app = Approval.objects.get(group=approval, event=event)
+                app.delete()
+            event.modified_user = request.user
+            event.save()
+            form.save_m2m()
+            return redirect('manage:events')
+    else:
         timezone.activate(pytz.timezone('UTC'))
         tag_format = lambda objects: ','.join(map(unicode, objects))
         participants_formatted = tag_format(event.participants.all())
         tags_formatted = tag_format(event.tags.all())
-        form.initial['participants'] = participants_formatted
-        form.initial['tags'] = tags_formatted
-        form.initial['timezone'] = timezone.get_current_timezone()
-        return form
-
-    return _process_form(request, forms.EventEditForm, event,
-                         'manage/event_edit.html', 'manage:events',
-                         pre_save_event_edit, render_form_event_edit)
+        form = forms.EventEditForm(instance=event, initial={
+            'participants': participants_formatted,
+            'tags': tags_formatted,
+            'timezone': timezone.get_current_timezone() # UTC
+        })
+    return render(request, 'manage/event_edit.html', {'form': form,
+                                                      'event': event})
 
 
 @staff_required
 @permission_required('add_event')
 @json_view
 def tag_autocomplete(request):
-    """ Feeds JSON tag names to the Event Request form. """
+    """Feeds JSON tag names to the Event request/edit form."""
     query = request.GET['q']
     tags = Tag.objects.filter(name__istartswith=query)[:5]
     tag_names = [{'id': t.name, 'text': t.name} for t in tags]
@@ -241,7 +256,7 @@ def tag_autocomplete(request):
 @permission_required('add_event')
 @json_view
 def participant_autocomplete(request):
-    """ Participant names to Event Request autocompleter. """
+    """Participant names to Event request/edit autocompleter."""
     query = request.GET['q']
     participants = Participant.objects.filter(name__icontains=query)
     # Only match names with a component which starts with the query
@@ -253,32 +268,36 @@ def participant_autocomplete(request):
 
 @staff_required
 @permission_required('change_event')
+@cancel_redirect('manage:events')
 def event_archive(request, id):
     """Dedicated page for setting page template (archive) and archive time."""
     event = Event.objects.get(id=id)
+    if request.method == 'POST':
+        form = forms.EventArchiveForm(request.POST, instance=event)
+        if form.is_valid():
+            event = form.save(commit=False)
+            minutes = form.cleaned_data['archive_time']
+            event.archive_time = (
+                event.start_time + datetime.timedelta(minutes=minutes)
+            )
+            event.save()
+            return redirect('manage:events')
+    else:
+        form = forms.EventArchiveForm(instance=event)
 
-    def pre_save_event_archive(event, form):
-        minutes = form.cleaned_data['archive_time']
-        event.archive_time = (
-            event.start_time + datetime.timedelta(minutes=minutes)
-        )
-        return event
-
-    return _process_form(request, forms.EventArchiveForm, event,
-                         'manage/event_archive.html', 'manage:events',
-                         pre_save_event_archive)
+    return render(request, 'manage/event_archive.html',
+                  {'form': form, 'event': event})
 
 
 @staff_required
 @permission_required('change_participant')
 def participants(request):
-    """Participants page:  view and search participants/speakers. """
+    """Participants page:  view and search participants/speakers."""
     if request.method == 'POST':
         search_form = forms.ParticipantFindForm(request.POST)
         if search_form.is_valid():
-            participants = Participant.objects.filter(
-                name__icontains=search_form.cleaned_data['name']
-            )
+            participants = Participant.objects.filter(name__icontains=
+                                       search_form.cleaned_data['name'])
         else:
             participants = Participant.objects.all()
     else:
@@ -291,35 +310,39 @@ def participants(request):
     )
     participants_paged = paginate(participants, request.GET.get('page'), 10)
     return render(request, 'manage/participants.html',
-                  {'paginate': participants_paged, 'form': search_form,
-                   'participants_not_clear': participants_not_clear})
+                  {'participants_clear': participants_paged,
+                   'participants_not_clear': participants_not_clear, 
+                   'form': search_form})
 
 
 @staff_required
 @permission_required('change_participant')
+@cancel_redirect('manage:participants')
 def participant_edit(request, id):
-    """ Participant edit page:  update biographical info. """
+    """Participant edit page:  update biographical info."""
     participant = Participant.objects.get(id=id)
-    if 'sendmail' in request.POST:
-        redirect_view = 'manage:participant_email'
-        redirect_data = {'id': participant.id}
+    if request.method == 'POST':
+        form = forms.ParticipantEditForm(request.POST, request.FILES,
+                                   instance=participant)
+        if form.is_valid():
+            participant = form.save(commit=False)
+            if not participant.slug:
+                participant.slug = unique_slugify(participant.name,
+                                                  [Participant])
+            participant.save()
+            if 'sendmail' in request.POST:
+                return redirect('manage:participant_email', id=participant.id)
+            return redirect('manage:participants')
     else:
-        redirect_view = 'manage:participants'
-        redirect_data = {}
-
-    def pre_save_participant_edit(participant, form):
-        if not participant.slug:
-            participant.slug = unique_slugify(participant.name, [Participant])
-        return participant
-    return _process_form(request, forms.ParticipantEditForm, participant,
-                         'manage/participant_edit.html', redirect_view,
-                         pre_save_participant_edit,
-                         redirect_data=redirect_data)
+        form = forms.ParticipantEditForm(instance=participant)
+    return render(request, 'manage/participant_edit.html',
+                  {'form': form, 'participant': participant})
 
 
 @staff_required
 @permission_required('change_participant')
 def participant_email(request, id):
+    """Dedicated page for sending an email to a Participant."""
     participant = Participant.objects.get(id=id)
     to_addr = participant.email
     from_addr = settings.EMAIL_FROM_ADDRESS
@@ -358,14 +381,22 @@ def participant_email(request, id):
 
 @staff_required
 @permission_required('add_participant')
+@cancel_redirect('manage:participants')
 def participant_new(request):
-    def pre_save_participant_new(participant, form):
-        if not participant.slug:
-            participant.slug = unique_slugify(participant.name, [Participant])
-        return participant
-    return _process_form(request, forms.ParticipantEditForm, Participant(),
-                         'manage/participant_new.html', 'manage:participants',
-                         pre_save_participant_new)
+    if request.method == 'POST':
+        form = forms.ParticipantEditForm(request.POST, request.FILES,
+                                   instance=Participant())
+        if form.is_valid():
+            participant = form.save(commit=False)
+            if not participant.slug:
+                participant.slug = unique_slugify(participant.name,
+                                                  [Participant])
+            participant.save()
+            return redirect('manage:participants')
+    else:
+        form = forms.ParticipantEditForm()
+    return render(request, 'manage/participant_new.html',
+                  {'form': form})
 
 
 @staff_required
@@ -387,6 +418,8 @@ def categories(request):
 @permission_required('change_template')
 @json_view
 def template_env_autofill(request):
+    """JSON response containing undefined variables in the requested template.
+       Provides template for filling in environment."""
     template_id = request.GET['template']
     template = Template.objects.get(id=template_id)
     env = Environment()
@@ -405,17 +438,32 @@ def templates(request):
 
 @staff_required
 @permission_required('change_template')
+@cancel_redirect('manage:templates')
 def template_edit(request, id):
     template = Template.objects.get(id=id)
-    return _process_form(request, forms.TemplateEditForm, template,
-                         'manage/template_edit.html', 'manage:templates')
+    if request.method == 'POST':
+        form = forms.TemplateEditForm(request.POST, instance=template)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:templates')
+    else:
+        form = forms.TemplateEditForm(instance=template)
+    return render(request, 'manage/template_edit.html', {'form': form,
+                                                         'template': template})
 
 
 @staff_required
 @permission_required('add_template')
+@cancel_redirect('manage:templates')
 def template_new(request):
-    return _process_form(request, forms.TemplateEditForm, Template(),
-                         'manage/template_new.html', 'manage:templates')
+    if request.method == 'POST':
+        form = forms.TemplateEditForm(request.POST, instance=Template())
+        if form.is_valid():
+            form.save()
+            return redirect('manage:templates')
+    else:
+        form = forms.TemplateEditForm()
+    return render(request, 'manage/template_new.html', {'form': form})
 
 
 @staff_required
@@ -436,18 +484,31 @@ def locations(request):
 
 @staff_required
 @permission_required('change_location')
+@cancel_redirect('manage:locations')
 def location_edit(request, id):
     location = Location.objects.get(id=id)
-    return _process_form(request, forms.LocationEditForm, location,
-                         'manage/location_edit.html', 'manage:locations')
+    if request.method == 'POST':
+        form = forms.LocationEditForm(request.POST, instance=location)
+        if form.is_valid():
+            form.save()
+            return redirect('manage:locations')
+    else:
+        form = forms.LocationEditForm(instance=location)
+    return render(request, 'manage/location_edit.html', {'form': form,
+                                                         'location': location})
 
 
 @staff_required
 @permission_required('add_location')
 def location_new(request):
-    return _process_form(request, forms.LocationEditForm, Location(),
-                         'manage/location_new.html', 'manage:locations')
-
+    if request.method == 'POST':
+        form = forms.LocationEditForm(request.POST, instance=Location())
+        if form.is_valid():
+            form.save()
+            return redirect('manage:locations')
+    else:
+        form = forms.LocationEditForm()
+    return render(request, 'manage/location_new.html', {'form': form})
 
 @staff_required
 @permission_required('change_location')
@@ -457,13 +518,13 @@ def location_remove(request, id):
         location.delete()
     return redirect('manage:locations')
 
-
 @staff_required
 @json_view
 def location_timezone(request):
+    """Responds with the timezone for the requested Location.  Used to
+       auto-fill the timezone form in event requests/edits."""
     location = get_object_or_404(Location, id=request.GET['location'])
     return {'timezone': location.timezone}
-
 
 @staff_required
 @permission_required('change_approval')
@@ -472,15 +533,15 @@ def approvals(request):
     approvals = Approval.objects.filter(group__in=user.groups.all(),
                                         processed=False)
     recent = (Approval.objects.filter(group__in=user.groups.all(),
-                                      processed=True)
+                                             processed=True)
                       .order_by('-processed_time')[:25])
     return render(request, 'manage/approvals.html', {'approvals': approvals,
                                                      'recent': recent})
 
-
 @staff_required
 @permission_required('change_approval')
 def approval_review(request, id):
+    """Approve/deny an event on behalf of a group."""
     approval = Approval.objects.get(id=id)
     if approval.group not in request.user.groups.all():
         return redirect('manage:approvals')

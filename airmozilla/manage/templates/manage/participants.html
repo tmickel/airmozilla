@@ -46,12 +46,13 @@
 {% endmacro %}
 
 {% block manage_content %}
+  {% set paginate = participants_clear %}
   {% if paginate.number == 1 %}
     <h3>Need clearing</h3>
     {{ participants_table(participants_not_clear) }}
   {% endif %}
   <h3>All participants</h3>
-  {{ participants_table(paginate) }} 
+  {{ participants_table(participants_clear) }} 
   {% include 'manage/_paginate.html' %}
   <p>
   <a href="{{ url('manage:participant_new') }}" class="btn">

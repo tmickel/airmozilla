@@ -2,14 +2,14 @@
 {% set page = "events" %}
 
 {% block manage_title %}
-  Editing event "{{ instance.title }}"
+  Editing event "{{ event.title }}"
 {% endblock %}
 
 {% block manage_content %}
   <div class="event-status span4 well">
-    <strong>Event status: {{ instance.status }}</strong>
+    <strong>Event status: {{ event.status }}</strong>
     <ul>
-      {% for approval in instance.approval_set.all() %}
+      {% for approval in event.approval_set.all() %}
         <li>
         {% if approval.processed %}
           {% set badge = 'success' if approval.approved else 'important' %}
@@ -29,11 +29,11 @@
       {% endfor %}
       <li>
         <span class="badge badge-info">Modified</span>
-        {{ instance.modified|js_date }}<br>{{ instance.modified_user.email }}
+        {{ event.modified|js_date }}<br>{{ event.modified_user.email }}
       </li>
       <li>
         <span class="badge badge-info">Created</span>
-        {{ instance.created|js_date }}<br>{{ instance.creator.email }}</li>
+        {{ event.created|js_date }}<br>{{ event.creator.email }}</li>
     </ul>
   </div>
   {% include 'manage/_default_form_upload.html' %}
