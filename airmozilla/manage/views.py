@@ -71,7 +71,8 @@ def user_edit(request, id):
             return redirect('manage:users')
     else:
         form = forms.UserEditForm(instance=user)
-    return render(request, 'manage/user_edit.html', {'form': form, 'user': user})
+    return render(request, 'manage/user_edit.html',
+                  {'form': form, 'user': user})
 
 
 @staff_required
@@ -120,7 +121,8 @@ def group_new(request):
 def event_request(request):
     """Event request page:  create new events to be published."""
     if request.method == 'POST':
-        form = forms.EventRequestForm(request.POST, request.FILES, instance=Event())
+        form = forms.EventRequestForm(request.POST, request.FILES,
+                                      instance=Event())
         if form.is_valid():
             event = form.save(commit=False)
             tz = pytz.timezone(request.POST['timezone'])
@@ -146,8 +148,8 @@ def events(request):
         search_form = forms.EventFindForm(request.POST)
         if search_form.is_valid():
             search_results = Event.objects.filter(
-                             title__icontains=search_form.cleaned_data['title']
-                             ).order_by('-start_time')
+                title__icontains=search_form.cleaned_data['title']
+            ).order_by('-start_time')
     else:
         search_form = forms.EventFindForm()
     initiated = Event.objects.initiated().order_by('start_time')
@@ -193,7 +195,7 @@ def event_edit(request, id):
                 subject = ('[Air Mozilla] Approval requested: "%s"' %
                            event.title)
                 message = render_to_string(
-                'manage/_email_approval.html',
+                    'manage/_email_approval.html',
                     {
                         'group': group.name,
                         'manage_url': request.build_absolute_uri(
@@ -223,7 +225,7 @@ def event_edit(request, id):
         form = forms.EventEditForm(instance=event, initial={
             'participants': participants_formatted,
             'tags': tags_formatted,
-            'timezone': timezone.get_current_timezone() # UTC
+            'timezone': timezone.get_current_timezone()  # UTC
         })
     return render(request, 'manage/event_edit.html', {'form': form,
                                                       'event': event})
@@ -286,8 +288,9 @@ def participants(request):
     if request.method == 'POST':
         search_form = forms.ParticipantFindForm(request.POST)
         if search_form.is_valid():
-            participants = Participant.objects.filter(name__icontains=
-                                       search_form.cleaned_data['name'])
+            participants = Participant.objects.filter(
+                name__icontains=search_form.cleaned_data['name']
+            )
         else:
             participants = Participant.objects.all()
     else:
@@ -301,7 +304,7 @@ def participants(request):
     participants_paged = paginate(participants, request.GET.get('page'), 10)
     return render(request, 'manage/participants.html',
                   {'participants_clear': participants_paged,
-                   'participants_not_clear': participants_not_clear, 
+                   'participants_not_clear': participants_not_clear,
                    'form': search_form})
 
 
@@ -313,7 +316,7 @@ def participant_edit(request, id):
     participant = Participant.objects.get(id=id)
     if request.method == 'POST':
         form = forms.ParticipantEditForm(request.POST, request.FILES,
-                                   instance=participant)
+                                         instance=participant)
         if form.is_valid():
             form.save()
             if 'sendmail' in request.POST:
@@ -371,7 +374,7 @@ def participant_email(request, id):
 def participant_new(request):
     if request.method == 'POST':
         form = forms.ParticipantEditForm(request.POST, request.FILES,
-                                   instance=Participant())
+                                         instance=Participant())
         if form.is_valid():
             form.save()
             return redirect('manage:participants')
@@ -492,6 +495,7 @@ def location_new(request):
         form = forms.LocationEditForm()
     return render(request, 'manage/location_new.html', {'form': form})
 
+
 @staff_required
 @permission_required('change_location')
 def location_remove(request, id):
@@ -499,6 +503,7 @@ def location_remove(request, id):
         location = Location.objects.get(id=id)
         location.delete()
     return redirect('manage:locations')
+
 
 @staff_required
 @json_view
@@ -508,6 +513,7 @@ def location_timezone(request):
     location = get_object_or_404(Location, id=request.GET['location'])
     return {'timezone': location.timezone}
 
+
 @staff_required
 @permission_required('change_approval')
 def approvals(request):
@@ -515,10 +521,11 @@ def approvals(request):
     approvals = Approval.objects.filter(group__in=user.groups.all(),
                                         processed=False)
     recent = (Approval.objects.filter(group__in=user.groups.all(),
-                                             processed=True)
+                                      processed=True)
                       .order_by('-processed_time')[:25])
     return render(request, 'manage/approvals.html', {'approvals': approvals,
                                                      'recent': recent})
+
 
 @staff_required
 @permission_required('change_approval')
