@@ -175,7 +175,7 @@ class EventFindForm(BaseModelForm):
 class ParticipantEditForm(BaseModelForm):
     class Meta:
         model = Participant
-
+        exclude = ('creator',)
 
 class ParticipantFindForm(BaseModelForm):
     class Meta:

@@ -117,7 +117,7 @@ def group_new(request):
 
 @staff_required
 @permission_required('main.add_event')
-@cancel_redirect('manage:home')
+@cancel_redirect('manage:events')
 def event_request(request):
     """Event request page:  create new events to be published."""
     if request.user.has_perm('main.add_event_scheduled'):
@@ -137,7 +137,7 @@ def event_request(request):
             event.modified_user = request.user
             event.save()
             form.save_m2m()
-            return redirect('manage:home')
+            return redirect('manage:events')
     else:
         form = form_class()
     return render(request, 'manage/event_request.html', {'form': form})
@@ -190,7 +190,7 @@ def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
     if (not request.user.has_perm('main.change_event_others') and
-            request.user is not event.creator):
+            request.user != event.creator):
         return redirect('manage:events')
     if request.method == 'POST':
         form = forms.EventEditForm(request.POST, request.FILES, instance=event)
@@ -282,7 +282,7 @@ def event_archive(request, id):
     """Dedicated page for setting page template (archive) and archive time."""
     event = Event.objects.get(id=id)
     if (not request.user.has_perm('main.change_event_others') and
-            request.user is not event.creator):
+            request.user != event.creator):
         return redirect('manage:events')
     if request.method == 'POST':
         form = forms.EventArchiveForm(request.POST, instance=event)
@@ -335,7 +335,7 @@ def participant_edit(request, id):
     """Participant edit page:  update biographical info."""
     participant = Participant.objects.get(id=id)
     if (not request.user.has_perm('main.change_participant_others') and
-            participant.creator is not request.user):
+            participant.creator != request.user):
         return redirect('manage:participants')
     if request.method == 'POST':
         form = forms.ParticipantEditForm(request.POST, request.FILES,
@@ -357,7 +357,7 @@ def participant_email(request, id):
     """Dedicated page for sending an email to a Participant."""
     participant = Participant.objects.get(id=id)
     if (not request.user.has_perm('main.change_participant_others') and
-            participant.creator is not request.user):
+            participant.creator != request.user):
         return redirect('manage:participants')
     to_addr = participant.email
     from_addr = settings.EMAIL_FROM_ADDRESS
@@ -513,12 +513,16 @@ def location_edit(request, id):
 
 @staff_required
 @permission_required('main.add_location')
+@cancel_redirect('manage:home')
 def location_new(request):
     if request.method == 'POST':
         form = forms.LocationEditForm(request.POST, instance=Location())
         if form.is_valid():
             form.save()
-            return redirect('manage:locations')
+            if request.user.has_perm('main.change_location'):
+                return redirect('manage:locations')
+            else:
+                return redirect('manage:home')
     else:
         form = forms.LocationEditForm()
     return render(request, 'manage/location_new.html', {'form': form})
