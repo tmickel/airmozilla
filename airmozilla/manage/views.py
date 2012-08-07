@@ -43,7 +43,7 @@ def dashboard(request):
 
 
 @staff_required
-@permission_required('change_user')
+@permission_required('auth.change_user')
 def users(request):
     """User editor:  view users and update a user's group."""
     if request.method == 'POST':
@@ -59,7 +59,7 @@ def users(request):
 
 
 @staff_required
-@permission_required('change_user')
+@permission_required('auth.change_user')
 @cancel_redirect('manage:users')
 def user_edit(request, id):
     """Editing an individual user."""
@@ -76,7 +76,7 @@ def user_edit(request, id):
 
 
 @staff_required
-@permission_required('change_group')
+@permission_required('auth.change_group')
 def groups(request):
     """Group editor: view groups and change group permissions."""
     groups = Group.objects.all()
@@ -84,7 +84,7 @@ def groups(request):
 
 
 @staff_required
-@permission_required('change_group')
+@permission_required('auth.change_group')
 @cancel_redirect('manage:groups')
 def group_edit(request, id):
     """Edit an individual group."""
@@ -101,7 +101,7 @@ def group_edit(request, id):
 
 
 @staff_required
-@permission_required('add_group')
+@permission_required('auth.add_group')
 def group_new(request):
     """Add a new group."""
     group = Group()
@@ -116,11 +116,11 @@ def group_new(request):
 
 
 @staff_required
-@permission_required('add_event')
+@permission_required('main.add_event')
 @cancel_redirect('manage:home')
 def event_request(request):
     """Event request page:  create new events to be published."""
-    if request.user.has_perm('add_event_scheduled'):
+    if request.user.has_perm('main.add_event_scheduled'):
         form_class = forms.EventExperiencedRequestForm
     else:
         form_class = forms.EventRequestForm
@@ -144,10 +144,10 @@ def event_request(request):
 
 
 @staff_required
-@permission_required('change_event')
+@permission_required('main.change_event')
 def events(request):
     """Event edit/production:  approve, change, and publish events."""
-    if request.user.has_perm('change_event_others'):
+    if request.user.has_perm('main.change_event_others'):
         creator_filter = {}
     else:
         creator_filter = {'creator': request.user}
@@ -184,12 +184,12 @@ def events(request):
 
 
 @staff_required
-@permission_required('change_event')
+@permission_required('main.change_event')
 @cancel_redirect('manage:events')
 def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
-    if (not request.user.has_perm('change_event_others') and
+    if (not request.user.has_perm('main.change_event_others') and
             request.user is not event.creator):
         return redirect('manage:events')
     if request.method == 'POST':
@@ -249,7 +249,7 @@ def event_edit(request, id):
 
 
 @staff_required
-@permission_required('add_event')
+@permission_required('main.add_event')
 @json_view
 def tag_autocomplete(request):
     """Feeds JSON tag names to the Event request/edit form."""
@@ -262,7 +262,7 @@ def tag_autocomplete(request):
 
 
 @staff_required
-@permission_required('add_event')
+@permission_required('main.add_event')
 @json_view
 def participant_autocomplete(request):
     """Participant names to Event request/edit autocompleter."""
@@ -276,12 +276,12 @@ def participant_autocomplete(request):
 
 
 @staff_required
-@permission_required('change_event')
+@permission_required('main.change_event')
 @cancel_redirect('manage:events')
 def event_archive(request, id):
     """Dedicated page for setting page template (archive) and archive time."""
     event = Event.objects.get(id=id)
-    if (not request.user.has_perm('change_event_others') and
+    if (not request.user.has_perm('main.change_event_others') and
             request.user is not event.creator):
         return redirect('manage:events')
     if request.method == 'POST':
@@ -302,31 +302,24 @@ def event_archive(request, id):
 
 
 @staff_required
-@permission_required('change_participant')
+@permission_required('main.change_participant')
 def participants(request):
     """Participants page:  view and search participants/speakers."""
-    if request.user.has_perm('change_participant_others'):
-        creator_filter = {}
-    else:
-        creator_filter = {'creator': request.user}
     if request.method == 'POST':
         search_form = forms.ParticipantFindForm(request.POST)
         if search_form.is_valid():
             participants = Participant.objects.filter(
                 name__icontains=search_form.cleaned_data['name'],
-                **creator_filter
             )
         else:
-            participants = Participant.objects.filter(**creator_filter)
+            participants = Participant.objects.all()
     else:
         participants = Participant.objects.exclude(
             cleared=Participant.CLEARED_NO,
-            **creator_filter
         )
         search_form = forms.ParticipantFindForm()
     participants_not_clear = Participant.objects.filter(
         cleared=Participant.CLEARED_NO,
-        **creator_filter
     )
     participants_paged = paginate(participants, request.GET.get('page'), 10)
     return render(request, 'manage/participants.html',
@@ -336,12 +329,12 @@ def participants(request):
 
 
 @staff_required
-@permission_required('change_participant')
+@permission_required('main.change_participant')
 @cancel_redirect('manage:participants')
 def participant_edit(request, id):
     """Participant edit page:  update biographical info."""
     participant = Participant.objects.get(id=id)
-    if (not request.user.has_perm('change_participant_others') and
+    if (not request.user.has_perm('main.change_participant_others') and
             participant.creator is not request.user):
         return redirect('manage:participants')
     if request.method == 'POST':
@@ -359,11 +352,11 @@ def participant_edit(request, id):
 
 
 @staff_required
-@permission_required('change_participant')
+@permission_required('main.change_participant')
 def participant_email(request, id):
     """Dedicated page for sending an email to a Participant."""
     participant = Participant.objects.get(id=id)
-    if (not request.user.has_perm('change_participant_others') and
+    if (not request.user.has_perm('main.change_participant_others') and
             participant.creator is not request.user):
         return redirect('manage:participants')
     to_addr = participant.email
@@ -402,7 +395,7 @@ def participant_email(request, id):
 
 
 @staff_required
-@permission_required('add_participant')
+@permission_required('main.add_participant')
 @cancel_redirect('manage:participants')
 def participant_new(request):
     if request.method == 'POST':
@@ -420,7 +413,7 @@ def participant_new(request):
 
 
 @staff_required
-@permission_required('change_category')
+@permission_required('main.change_category')
 def categories(request):
     categories = Category.objects.all()
     if request.method == 'POST':
@@ -435,7 +428,7 @@ def categories(request):
 
 
 @staff_required
-@permission_required('change_template')
+@permission_required('main.change_template')
 @json_view
 def template_env_autofill(request):
     """JSON response containing undefined variables in the requested template.
@@ -450,14 +443,14 @@ def template_env_autofill(request):
 
 
 @staff_required
-@permission_required('change_template')
+@permission_required('main.change_template')
 def templates(request):
     templates = Template.objects.all()
     return render(request, 'manage/templates.html', {'templates': templates})
 
 
 @staff_required
-@permission_required('change_template')
+@permission_required('main.change_template')
 @cancel_redirect('manage:templates')
 def template_edit(request, id):
     template = Template.objects.get(id=id)
@@ -473,7 +466,7 @@ def template_edit(request, id):
 
 
 @staff_required
-@permission_required('add_template')
+@permission_required('main.add_template')
 @cancel_redirect('manage:templates')
 def template_new(request):
     if request.method == 'POST':
@@ -487,7 +480,7 @@ def template_new(request):
 
 
 @staff_required
-@permission_required('remove_template')
+@permission_required('main.remove_template')
 def template_remove(request, id):
     if request.method == 'POST':
         template = Template.objects.get(id=id)
@@ -496,14 +489,14 @@ def template_remove(request, id):
 
 
 @staff_required
-@permission_required('change_location')
+@permission_required('main.change_location')
 def locations(request):
     locations = Location.objects.all()
     return render(request, 'manage/locations.html', {'locations': locations})
 
 
 @staff_required
-@permission_required('change_location')
+@permission_required('main.change_location')
 @cancel_redirect('manage:locations')
 def location_edit(request, id):
     location = Location.objects.get(id=id)
@@ -519,7 +512,7 @@ def location_edit(request, id):
 
 
 @staff_required
-@permission_required('add_location')
+@permission_required('main.add_location')
 def location_new(request):
     if request.method == 'POST':
         form = forms.LocationEditForm(request.POST, instance=Location())
@@ -532,7 +525,7 @@ def location_new(request):
 
 
 @staff_required
-@permission_required('change_location')
+@permission_required('main.delete_location')
 def location_remove(request, id):
     if request.method == 'POST':
         location = Location.objects.get(id=id)
@@ -550,7 +543,7 @@ def location_timezone(request):
 
 
 @staff_required
-@permission_required('change_approval')
+@permission_required('main.change_approval')
 def approvals(request):
     user = request.user
     approvals = Approval.objects.filter(group__in=user.groups.all(),
@@ -563,7 +556,7 @@ def approvals(request):
 
 
 @staff_required
-@permission_required('change_approval')
+@permission_required('main.change_approval')
 def approval_review(request, id):
     """Approve/deny an event on behalf of a group."""
     approval = Approval.objects.get(id=id)
