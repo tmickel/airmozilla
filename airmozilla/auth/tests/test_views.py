@@ -27,7 +27,7 @@ class TestViews(TestCase):
 
     def test_nonmozilla(self):
         """Non-Mozilla email -> failure."""
-        response = self._login_attempt('tmickel@yahoo.com')
+        response = self._login_attempt('tmickel@mit.edu')
         self.assertRedirects(response,
                              reverse(settings.LOGIN_REDIRECT_URL_FAILURE))
 
