@@ -151,7 +151,9 @@ class TestEvents(TestCase):
     placeholder = 'airmozilla/manage/tests/firefox.png'
 
     def setUp(self):
-        User.objects.create_superuser('fake', 'fake@fake.com', 'fake')
+        self.user = (
+            User.objects.create_superuser('fake', 'fake@fake.com', 'fake')
+        )
         assert self.client.login(username='fake', password='fake')
 
     def test_event_request(self):
@@ -174,6 +176,7 @@ class TestEvents(TestCase):
         eq_(response_fail.status_code, 200)
         event = Event.objects.get(title='Airmozilla Launch Test')
         eq_(event.location, Location.objects.get(id=1))
+        eq_(event.creator, self.user)
 
     def test_tag_autocomplete(self):
         """Autocomplete makes JSON for fixture tags and a nonexistent tag."""
@@ -246,6 +249,7 @@ class TestEvents(TestCase):
         ok_(EventOldSlug.objects.get(slug='test-event', event=event))
         event = Event.objects.get(title='Tested event')
         eq_(event.slug, 'tested-event')
+        eq_(event.modified_user, self.user)
         response_fail = self.client.post(
             reverse('manage:event_edit', kwargs={'id': event.id}),
             {
@@ -332,7 +336,9 @@ class TestParticipants(TestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
 
     def setUp(self):
-        User.objects.create_superuser('fake', 'fake@fake.com', 'fake')
+        self.user = (
+            User.objects.create_superuser('fake', 'fake@fake.com', 'fake')
+        )
         assert self.client.login(username='fake', password='fake')
 
     def test_participant_pages(self):
@@ -407,6 +413,7 @@ class TestParticipants(TestCase):
         self.assertRedirects(response_ok, reverse('manage:participants'))
         participant = Participant.objects.get(name='Mozilla Firefox')
         eq_(participant.email, 'mozilla@mozilla.com')
+        eq_(participant.creator, self.user)
 
 
 class TestCategories(TestCase):
