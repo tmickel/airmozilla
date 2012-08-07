@@ -94,7 +94,9 @@
         {{ event_table('Upcoming events', upcoming) }}
       {% endif %}
     {% endif %}
-    {{ event_table('Archived events', archived) }}
+    {% if archived %}
+      {{ event_table('Archived events', archived) }}
+    {% endif %}
     {% include 'manage/_paginate.html' %}
   {% endif %}
   <p>
