@@ -4,7 +4,7 @@
     ('Home', 'main:home', 'home', True),
     ('About', 'main:about', 'about', True),
     ('Management', 'manage:home', '', request.user.is_staff),
-    ('Log out', 'auth:logout', '', request.user.is_active),
+    ('Sign out', 'auth:logout', '', request.user.is_active),
 ] -%}
 
 {% block page_title %}
