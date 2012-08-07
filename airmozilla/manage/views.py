@@ -283,13 +283,11 @@ def participant_autocomplete(request):
 
 
 @staff_required
-@permission_required('main.change_event')
+@permission_required('main.change_event_others')
 @cancel_redirect('manage:events')
 def event_archive(request, id):
     """Dedicated page for setting page template (archive) and archive time."""
     event = Event.objects.get(id=id)
-    if not request.user.has_perm('main.change_event_others'):
-        return redirect('manage:events')
     if request.method == 'POST':
         form = forms.EventArchiveForm(request.POST, instance=event)
         if form.is_valid():
