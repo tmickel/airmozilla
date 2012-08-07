@@ -330,7 +330,20 @@ class TestEvents(TestCase):
             datetime.datetime(2012, 12, 25, 23).replace(tzinfo=utc),
             'Modify event winter date - Pacific UTC-08 input'
         )
-
+    
+    def test_event_archive(self):
+        """Event archive page loads and shows correct archive_time behavior."""
+        event = Event.objects.get(title='Test event')
+        event.archive_time = None
+        event.save()
+        url = reverse('manage:event_archive', kwargs={'id': event.id})
+        response_ok = self.client.get(url)
+        eq_(response_ok.status_code, 200)
+        response_ok = self.client.post(url, {'archive_time': '120'})
+        self.assertRedirects(response_ok, reverse('manage:events'))
+        event_modified = Event.objects.get(id=event.id)
+        eq_(event_modified.archive_time, 
+            event_modified.start_time + datetime.timedelta(minutes=120))
 
 class TestParticipants(TestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
