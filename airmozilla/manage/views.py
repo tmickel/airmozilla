@@ -313,17 +313,17 @@ def participants(request):
         search_form = forms.ParticipantFindForm(request.POST)
         if search_form.is_valid():
             participants = Participant.objects.filter(
-                name__icontains=search_form.cleaned_data['name'],
+                name__icontains=search_form.cleaned_data['name']
             )
         else:
             participants = Participant.objects.all()
     else:
         participants = Participant.objects.exclude(
-            cleared=Participant.CLEARED_NO,
+            cleared=Participant.CLEARED_NO
         )
         search_form = forms.ParticipantFindForm()
     participants_not_clear = Participant.objects.filter(
-        cleared=Participant.CLEARED_NO,
+        cleared=Participant.CLEARED_NO
     )
     participants_paged = paginate(participants, request.GET.get('page'), 10)
     return render(request, 'manage/participants.html',
