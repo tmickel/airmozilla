@@ -170,8 +170,7 @@ class TestEvents(TestCase):
                     'title': 'Test fails, not enough data!',
                 }
             )
-        # update this when there is a proper success page for event requests
-        self.assertRedirects(response_ok, reverse('manage:home'))
+        self.assertRedirects(response_ok, reverse('manage:events'))
         eq_(response_fail.status_code, 200)
         event = Event.objects.get(title='Airmozilla Launch Test')
         eq_(event.location, Location.objects.get(id=1))
