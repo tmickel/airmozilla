@@ -1,0 +1,1127 @@
+[
+    {
+        "pk": 4, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_group", 
+            "name": "Can add group", 
+            "content_type": [
+                "auth", 
+                "group"
+            ]
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_group", 
+            "name": "Can change group", 
+            "content_type": [
+                "auth", 
+                "group"
+            ]
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_group", 
+            "name": "Can delete group", 
+            "content_type": [
+                "auth", 
+                "group"
+            ]
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_permission", 
+            "name": "Can add permission", 
+            "content_type": [
+                "auth", 
+                "permission"
+            ]
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_permission", 
+            "name": "Can change permission", 
+            "content_type": [
+                "auth", 
+                "permission"
+            ]
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_permission", 
+            "name": "Can delete permission", 
+            "content_type": [
+                "auth", 
+                "permission"
+            ]
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_user", 
+            "name": "Can add user", 
+            "content_type": [
+                "auth", 
+                "user"
+            ]
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_user", 
+            "name": "Can change user", 
+            "content_type": [
+                "auth", 
+                "user"
+            ]
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_user", 
+            "name": "Can delete user", 
+            "content_type": [
+                "auth", 
+                "user"
+            ]
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_contenttype", 
+            "name": "Can add content type", 
+            "content_type": [
+                "contenttypes", 
+                "contenttype"
+            ]
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_contenttype", 
+            "name": "Can change content type", 
+            "content_type": [
+                "contenttypes", 
+                "contenttype"
+            ]
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_contenttype", 
+            "name": "Can delete content type", 
+            "content_type": [
+                "contenttypes", 
+                "contenttype"
+            ]
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_crontabschedule", 
+            "name": "Can add crontab", 
+            "content_type": [
+                "djcelery", 
+                "crontabschedule"
+            ]
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_crontabschedule", 
+            "name": "Can change crontab", 
+            "content_type": [
+                "djcelery", 
+                "crontabschedule"
+            ]
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_crontabschedule", 
+            "name": "Can delete crontab", 
+            "content_type": [
+                "djcelery", 
+                "crontabschedule"
+            ]
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_intervalschedule", 
+            "name": "Can add interval", 
+            "content_type": [
+                "djcelery", 
+                "intervalschedule"
+            ]
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_intervalschedule", 
+            "name": "Can change interval", 
+            "content_type": [
+                "djcelery", 
+                "intervalschedule"
+            ]
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_intervalschedule", 
+            "name": "Can delete interval", 
+            "content_type": [
+                "djcelery", 
+                "intervalschedule"
+            ]
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_periodictask", 
+            "name": "Can add periodic task", 
+            "content_type": [
+                "djcelery", 
+                "periodictask"
+            ]
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_periodictask", 
+            "name": "Can change periodic task", 
+            "content_type": [
+                "djcelery", 
+                "periodictask"
+            ]
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_periodictask", 
+            "name": "Can delete periodic task", 
+            "content_type": [
+                "djcelery", 
+                "periodictask"
+            ]
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_periodictasks", 
+            "name": "Can add periodic tasks", 
+            "content_type": [
+                "djcelery", 
+                "periodictasks"
+            ]
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_periodictasks", 
+            "name": "Can change periodic tasks", 
+            "content_type": [
+                "djcelery", 
+                "periodictasks"
+            ]
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_periodictasks", 
+            "name": "Can delete periodic tasks", 
+            "content_type": [
+                "djcelery", 
+                "periodictasks"
+            ]
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_taskmeta", 
+            "name": "Can add task meta", 
+            "content_type": [
+                "djcelery", 
+                "taskmeta"
+            ]
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_taskmeta", 
+            "name": "Can change task meta", 
+            "content_type": [
+                "djcelery", 
+                "taskmeta"
+            ]
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_taskmeta", 
+            "name": "Can delete task meta", 
+            "content_type": [
+                "djcelery", 
+                "taskmeta"
+            ]
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_tasksetmeta", 
+            "name": "Can add taskset meta", 
+            "content_type": [
+                "djcelery", 
+                "tasksetmeta"
+            ]
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_tasksetmeta", 
+            "name": "Can change taskset meta", 
+            "content_type": [
+                "djcelery", 
+                "tasksetmeta"
+            ]
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_tasksetmeta", 
+            "name": "Can delete taskset meta", 
+            "content_type": [
+                "djcelery", 
+                "tasksetmeta"
+            ]
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_taskstate", 
+            "name": "Can add task", 
+            "content_type": [
+                "djcelery", 
+                "taskstate"
+            ]
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_taskstate", 
+            "name": "Can change task", 
+            "content_type": [
+                "djcelery", 
+                "taskstate"
+            ]
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_taskstate", 
+            "name": "Can delete task", 
+            "content_type": [
+                "djcelery", 
+                "taskstate"
+            ]
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_workerstate", 
+            "name": "Can add worker", 
+            "content_type": [
+                "djcelery", 
+                "workerstate"
+            ]
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_workerstate", 
+            "name": "Can change worker", 
+            "content_type": [
+                "djcelery", 
+                "workerstate"
+            ]
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_workerstate", 
+            "name": "Can delete worker", 
+            "content_type": [
+                "djcelery", 
+                "workerstate"
+            ]
+        }
+    }, 
+    {
+        "pk": 67, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_approval", 
+            "name": "Can add approval", 
+            "content_type": [
+                "main", 
+                "approval"
+            ]
+        }
+    }, 
+    {
+        "pk": 68, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_approval", 
+            "name": "Can change approval", 
+            "content_type": [
+                "main", 
+                "approval"
+            ]
+        }
+    }, 
+    {
+        "pk": 69, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_approval", 
+            "name": "Can delete approval", 
+            "content_type": [
+                "main", 
+                "approval"
+            ]
+        }
+    }, 
+    {
+        "pk": 43, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_category", 
+            "name": "Can add category", 
+            "content_type": [
+                "main", 
+                "category"
+            ]
+        }
+    }, 
+    {
+        "pk": 44, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_category", 
+            "name": "Can change category", 
+            "content_type": [
+                "main", 
+                "category"
+            ]
+        }
+    }, 
+    {
+        "pk": 45, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_category", 
+            "name": "Can delete category", 
+            "content_type": [
+                "main", 
+                "category"
+            ]
+        }
+    }, 
+    {
+        "pk": 49, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_event", 
+            "name": "Can add event", 
+            "content_type": [
+                "main", 
+                "event"
+            ]
+        }
+    }, 
+    {
+        "pk": 77, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_event_scheduled", 
+            "name": "Can create events with scheduled status", 
+            "content_type": [
+                "main", 
+                "event"
+            ]
+        }
+    }, 
+    {
+        "pk": 50, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_event", 
+            "name": "Can change event", 
+            "content_type": [
+                "main", 
+                "event"
+            ]
+        }
+    }, 
+    {
+        "pk": 76, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_event_others", 
+            "name": "Can edit events created by other users", 
+            "content_type": [
+                "main", 
+                "event"
+            ]
+        }
+    }, 
+    {
+        "pk": 51, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_event", 
+            "name": "Can delete event", 
+            "content_type": [
+                "main", 
+                "event"
+            ]
+        }
+    }, 
+    {
+        "pk": 52, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_eventoldslug", 
+            "name": "Can add event old slug", 
+            "content_type": [
+                "main", 
+                "eventoldslug"
+            ]
+        }
+    }, 
+    {
+        "pk": 53, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_eventoldslug", 
+            "name": "Can change event old slug", 
+            "content_type": [
+                "main", 
+                "eventoldslug"
+            ]
+        }
+    }, 
+    {
+        "pk": 54, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_eventoldslug", 
+            "name": "Can delete event old slug", 
+            "content_type": [
+                "main", 
+                "eventoldslug"
+            ]
+        }
+    }, 
+    {
+        "pk": 70, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_location", 
+            "name": "Can add location", 
+            "content_type": [
+                "main", 
+                "location"
+            ]
+        }
+    }, 
+    {
+        "pk": 71, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_location", 
+            "name": "Can change location", 
+            "content_type": [
+                "main", 
+                "location"
+            ]
+        }
+    }, 
+    {
+        "pk": 72, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_location", 
+            "name": "Can delete location", 
+            "content_type": [
+                "main", 
+                "location"
+            ]
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_participant", 
+            "name": "Can add participant", 
+            "content_type": [
+                "main", 
+                "participant"
+            ]
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_participant", 
+            "name": "Can change participant", 
+            "content_type": [
+                "main", 
+                "participant"
+            ]
+        }
+    }, 
+    {
+        "pk": 78, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_participant_others", 
+            "name": "Can edit participants created by other users", 
+            "content_type": [
+                "main", 
+                "participant"
+            ]
+        }
+    }, 
+    {
+        "pk": 42, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_participant", 
+            "name": "Can delete participant", 
+            "content_type": [
+                "main", 
+                "participant"
+            ]
+        }
+    }, 
+    {
+        "pk": 46, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_tag", 
+            "name": "Can add tag", 
+            "content_type": [
+                "main", 
+                "tag"
+            ]
+        }
+    }, 
+    {
+        "pk": 47, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_tag", 
+            "name": "Can change tag", 
+            "content_type": [
+                "main", 
+                "tag"
+            ]
+        }
+    }, 
+    {
+        "pk": 48, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_tag", 
+            "name": "Can delete tag", 
+            "content_type": [
+                "main", 
+                "tag"
+            ]
+        }
+    }, 
+    {
+        "pk": 55, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_template", 
+            "name": "Can add template", 
+            "content_type": [
+                "main", 
+                "template"
+            ]
+        }
+    }, 
+    {
+        "pk": 56, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_template", 
+            "name": "Can change template", 
+            "content_type": [
+                "main", 
+                "template"
+            ]
+        }
+    }, 
+    {
+        "pk": 57, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_template", 
+            "name": "Can delete template", 
+            "content_type": [
+                "main", 
+                "template"
+            ]
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_session", 
+            "name": "Can add session", 
+            "content_type": [
+                "sessions", 
+                "session"
+            ]
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_session", 
+            "name": "Can change session", 
+            "content_type": [
+                "sessions", 
+                "session"
+            ]
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_session", 
+            "name": "Can delete session", 
+            "content_type": [
+                "sessions", 
+                "session"
+            ]
+        }
+    }, 
+    {
+        "pk": 73, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_migrationhistory", 
+            "name": "Can add migration history", 
+            "content_type": [
+                "south", 
+                "migrationhistory"
+            ]
+        }
+    }, 
+    {
+        "pk": 74, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_migrationhistory", 
+            "name": "Can change migration history", 
+            "content_type": [
+                "south", 
+                "migrationhistory"
+            ]
+        }
+    }, 
+    {
+        "pk": 75, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_migrationhistory", 
+            "name": "Can delete migration history", 
+            "content_type": [
+                "south", 
+                "migrationhistory"
+            ]
+        }
+    }, 
+    {
+        "pk": 61, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_kvstore", 
+            "name": "Can add kv store", 
+            "content_type": [
+                "thumbnail", 
+                "kvstore"
+            ]
+        }
+    }, 
+    {
+        "pk": 62, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_kvstore", 
+            "name": "Can change kv store", 
+            "content_type": [
+                "thumbnail", 
+                "kvstore"
+            ]
+        }
+    }, 
+    {
+        "pk": 63, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_kvstore", 
+            "name": "Can delete kv store", 
+            "content_type": [
+                "thumbnail", 
+                "kvstore"
+            ]
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "auth.group", 
+        "fields": {
+            "name": "Event Organizer", 
+            "permissions": [
+                [
+                    "add_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "change_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "add_location", 
+                    "main", 
+                    "location"
+                ], 
+                [
+                    "add_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "change_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "add_tag", 
+                    "main", 
+                    "tag"
+                ]
+            ]
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "auth.group", 
+        "fields": {
+            "name": "Experienced Event Organizer", 
+            "permissions": [
+                [
+                    "add_approval", 
+                    "main", 
+                    "approval"
+                ], 
+                [
+                    "delete_approval", 
+                    "main", 
+                    "approval"
+                ], 
+                [
+                    "add_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "add_event_scheduled", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "change_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "add_location", 
+                    "main", 
+                    "location"
+                ], 
+                [
+                    "add_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "change_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "add_tag", 
+                    "main", 
+                    "tag"
+                ]
+            ]
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "auth.group", 
+        "fields": {
+            "name": "PR", 
+            "permissions": [
+                [
+                    "add_approval", 
+                    "main", 
+                    "approval"
+                ], 
+                [
+                    "change_approval", 
+                    "main", 
+                    "approval"
+                ]
+            ]
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "auth.group", 
+        "fields": {
+            "name": "Producer", 
+            "permissions": [
+                [
+                    "change_user", 
+                    "auth", 
+                    "user"
+                ], 
+                [
+                    "add_approval", 
+                    "main", 
+                    "approval"
+                ], 
+                [
+                    "change_approval", 
+                    "main", 
+                    "approval"
+                ], 
+                [
+                    "delete_approval", 
+                    "main", 
+                    "approval"
+                ], 
+                [
+                    "add_category", 
+                    "main", 
+                    "category"
+                ], 
+                [
+                    "change_category", 
+                    "main", 
+                    "category"
+                ], 
+                [
+                    "delete_category", 
+                    "main", 
+                    "category"
+                ], 
+                [
+                    "add_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "add_event_scheduled", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "change_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "change_event_others", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "delete_event", 
+                    "main", 
+                    "event"
+                ], 
+                [
+                    "add_eventoldslug", 
+                    "main", 
+                    "eventoldslug"
+                ], 
+                [
+                    "change_eventoldslug", 
+                    "main", 
+                    "eventoldslug"
+                ], 
+                [
+                    "delete_eventoldslug", 
+                    "main", 
+                    "eventoldslug"
+                ], 
+                [
+                    "add_location", 
+                    "main", 
+                    "location"
+                ], 
+                [
+                    "change_location", 
+                    "main", 
+                    "location"
+                ], 
+                [
+                    "delete_location", 
+                    "main", 
+                    "location"
+                ], 
+                [
+                    "add_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "change_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "change_participant_others", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "delete_participant", 
+                    "main", 
+                    "participant"
+                ], 
+                [
+                    "add_tag", 
+                    "main", 
+                    "tag"
+                ], 
+                [
+                    "change_tag", 
+                    "main", 
+                    "tag"
+                ], 
+                [
+                    "delete_tag", 
+                    "main", 
+                    "tag"
+                ], 
+                [
+                    "add_template", 
+                    "main", 
+                    "template"
+                ], 
+                [
+                    "change_template", 
+                    "main", 
+                    "template"
+                ], 
+                [
+                    "delete_template", 
+                    "main", 
+                    "template"
+                ]
+            ]
+        }
+    }
+]
