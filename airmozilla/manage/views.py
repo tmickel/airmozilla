@@ -120,9 +120,13 @@ def group_new(request):
 @cancel_redirect('manage:home')
 def event_request(request):
     """Event request page:  create new events to be published."""
+    if request.user.has_perm('add_event_scheduled'):
+        form_class = forms.EventExperiencedRequestForm
+    else:
+        form_class = forms.EventRequestForm
     if request.method == 'POST':
-        form = forms.EventRequestForm(request.POST, request.FILES,
-                                      instance=Event())
+        form = form_class(request.POST, request.FILES,
+                          instance=Event())
         if form.is_valid():
             event = form.save(commit=False)
             tz = pytz.timezone(request.POST['timezone'])
@@ -135,7 +139,7 @@ def event_request(request):
             form.save_m2m()
             return redirect('manage:home')
     else:
-        form = forms.EventRequestForm()
+        form = form_class()
     return render(request, 'manage/event_request.html', {'form': form})
 
 
@@ -143,20 +147,30 @@ def event_request(request):
 @permission_required('change_event')
 def events(request):
     """Event edit/production:  approve, change, and publish events."""
+    if request.user.has_perm('change_event_others'):
+        creator_filter = {}
+    else:
+        creator_filter = {'creator': request.user}
     search_results = []
     if request.method == 'POST':
         search_form = forms.EventFindForm(request.POST)
         if search_form.is_valid():
             search_results = Event.objects.filter(
-                title__icontains=search_form.cleaned_data['title']
+                title__icontains=search_form.cleaned_data['title'],
+                **creator_filter
             ).order_by('-start_time')
     else:
         search_form = forms.EventFindForm()
-    initiated = Event.objects.initiated().order_by('start_time')
-    upcoming = Event.objects.upcoming().order_by('start_time')
-    live = Event.objects.live().order_by('start_time')
-    archiving = Event.objects.archiving().order_by('-archive_time')
-    archived = Event.objects.archived().order_by('-archive_time')
+    initiated = (Event.objects.initiated().filter(**creator_filter)
+                 .order_by('start_time'))
+    upcoming = (Event.objects.upcoming().filter(**creator_filter)
+                .order_by('start_time'))
+    live = (Event.objects.live().filter(**creator_filter)
+            .order_by('start_time'))
+    archiving = (Event.objects.archiving().filter(**creator_filter)
+                 .order_by('-archive_time'))
+    archived = (Event.objects.archived().filter(**creator_filter)
+                .order_by('-archive_time'))
     archived_paged = paginate(archived, request.GET.get('page'), 10)
     return render(request, 'manage/events.html', {
         'initiated': initiated,
@@ -175,6 +189,9 @@ def events(request):
 def event_edit(request, id):
     """Edit form for a particular event."""
     event = Event.objects.get(id=id)
+    if (not request.user.has_perm('change_event_others') and
+            request.user is not event.creator):
+        return redirect('manage:events')
     if request.method == 'POST':
         form = forms.EventEditForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
@@ -264,6 +281,9 @@ def participant_autocomplete(request):
 def event_archive(request, id):
     """Dedicated page for setting page template (archive) and archive time."""
     event = Event.objects.get(id=id)
+    if (not request.user.has_perm('change_event_others') and
+            request.user is not event.creator):
+        return redirect('manage:events')
     if request.method == 'POST':
         form = forms.EventArchiveForm(request.POST, instance=event)
         if form.is_valid():
@@ -285,21 +305,28 @@ def event_archive(request, id):
 @permission_required('change_participant')
 def participants(request):
     """Participants page:  view and search participants/speakers."""
+    if request.user.has_perm('change_participant_others'):
+        creator_filter = {}
+    else:
+        creator_filter = {'creator': request.user}
     if request.method == 'POST':
         search_form = forms.ParticipantFindForm(request.POST)
         if search_form.is_valid():
             participants = Participant.objects.filter(
-                name__icontains=search_form.cleaned_data['name']
+                name__icontains=search_form.cleaned_data['name'],
+                **creator_filter
             )
         else:
-            participants = Participant.objects.all()
+            participants = Participant.objects.filter(**creator_filter)
     else:
         participants = Participant.objects.exclude(
-            cleared=Participant.CLEARED_NO
+            cleared=Participant.CLEARED_NO,
+            **creator_filter
         )
         search_form = forms.ParticipantFindForm()
     participants_not_clear = Participant.objects.filter(
-        cleared=Participant.CLEARED_NO
+        cleared=Participant.CLEARED_NO,
+        **creator_filter
     )
     participants_paged = paginate(participants, request.GET.get('page'), 10)
     return render(request, 'manage/participants.html',
@@ -314,6 +341,9 @@ def participants(request):
 def participant_edit(request, id):
     """Participant edit page:  update biographical info."""
     participant = Participant.objects.get(id=id)
+    if (not request.user.has_perm('change_participant_others') and
+            participant.creator is not request.user):
+        return redirect('manage:participants')
     if request.method == 'POST':
         form = forms.ParticipantEditForm(request.POST, request.FILES,
                                          instance=participant)
@@ -333,6 +363,9 @@ def participant_edit(request, id):
 def participant_email(request, id):
     """Dedicated page for sending an email to a Participant."""
     participant = Participant.objects.get(id=id)
+    if (not request.user.has_perm('change_participant_others') and
+            participant.creator is not request.user):
+        return redirect('manage:participants')
     to_addr = participant.email
     from_addr = settings.EMAIL_FROM_ADDRESS
     reply_to = request.user.email
@@ -376,7 +409,9 @@ def participant_new(request):
         form = forms.ParticipantEditForm(request.POST, request.FILES,
                                          instance=Participant())
         if form.is_valid():
-            form.save()
+            participant = form.save(commit=False)
+            participant.creator = request.user
+            participant.save()
             return redirect('manage:participants')
     else:
         form = forms.ParticipantEditForm()
