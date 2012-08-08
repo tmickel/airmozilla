@@ -78,9 +78,8 @@ def participant(request, slug):
 def participant_clear(request, clear_token):
     participant = get_object_or_404(Participant, clear_token=clear_token)
     if request.method == 'POST':
-        participant.status = Participant.CLEARED_YES
+        participant.cleared = Participant.CLEARED_YES
         participant.clear_token = ''
-        print participant, participant.status
         participant.save()
         return render(request, 'main/participant_clear_done.html')
     else:
