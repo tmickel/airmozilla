@@ -75,6 +75,7 @@ def participant(request, slug):
         'participant': participant,
     })
 
+
 def participant_clear(request, clear_token):
     participant = get_object_or_404(Participant, clear_token=clear_token)
     if request.method == 'POST':

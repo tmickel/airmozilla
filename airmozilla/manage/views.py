@@ -361,6 +361,9 @@ def participant_edit(request, id):
 def participant_email(request, id):
     """Dedicated page for sending an email to a Participant."""
     participant = Participant.objects.get(id=id)
+    if (not request.user.has_perm('main.change_participant_others') and
+            participant.creator != request.user):
+        return redirect('manage:participants')
     if not participant.clear_token:
         participant.clear_token = str(uuid.uuid4())
         participant.save()
@@ -375,7 +378,7 @@ def participant_email(request, id):
     cc_addr = last_event.creator.email if last_event else None
     subject = ('Presenter profile on Air Mozilla (%s)' % participant.name)
     token_url = request.build_absolute_uri(
-        reverse('main:participant_clear', 
+        reverse('main:participant_clear',
                 kwargs={'clear_token': participant.clear_token})
     )
     message = render_to_string(
