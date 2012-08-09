@@ -130,6 +130,51 @@ def group_remove(request, id):
     return redirect('manage:groups')
 
 
+def _event_process(request, form, event):
+    """Generate and clean associated event data for an event request
+       or event edit:  timezone application, approvals update and
+       notifications, creator and modifier."""
+    if not event.creator:
+        event.creator = request.user
+    event.modified_user = request.user
+    tz = pytz.timezone(request.POST['timezone'])
+    event.start_time = tz_apply(event.start_time, tz)
+    if event.archive_time:
+        event.archive_time = tz_apply(event.archive_time, tz)
+    if 'approvals' in form.cleaned_data:
+        event.save()
+        approvals_old = [app.group for app in event.approval_set.all()]
+        approvals_new = form.cleaned_data['approvals']
+        approvals_add = set(approvals_new).difference(approvals_old)
+        approvals_remove = set(approvals_old).difference(approvals_new)
+        for approval in approvals_add:
+            group = Group.objects.get(name=approval)
+            app = Approval(group=group, event=event)
+            app.save()
+            emails = [u.email for u in group.user_set.all()]
+            subject = ('[Air Mozilla] Approval requested: "%s"' %
+                       event.title)
+            message = render_to_string(
+                'manage/_email_approval.html',
+                {
+                    'group': group.name,
+                    'manage_url': request.build_absolute_uri(
+                        reverse('manage:approvals')
+                    ),
+                    'title': event.title,
+                    'creator': event.creator.email,
+                    'datetime': event.start_time,
+                    'description': event.description
+                }
+            )
+            email = EmailMessage(subject, message,
+                                 settings.EMAIL_FROM_ADDRESS, emails)
+            email.send()
+        for approval in approvals_remove:
+            app = Approval.objects.get(group=approval, event=event)
+            app.delete()
+
+
 @staff_required
 @permission_required('main.add_event')
 @cancel_redirect('manage:events')
@@ -144,12 +189,7 @@ def event_request(request):
                           instance=Event())
         if form.is_valid():
             event = form.save(commit=False)
-            tz = pytz.timezone(request.POST['timezone'])
-            event.start_time = tz_apply(event.start_time, tz)
-            if event.archive_time:
-                event.archive_time = tz_apply(event.archive_time, tz)
-            event.creator = request.user
-            event.modified_user = request.user
+            _event_process(request, form, event)
             event.save()
             form.save_m2m()
             messages.success(request,
@@ -219,42 +259,7 @@ def event_edit(request, id):
         form = form_class(request.POST, request.FILES, instance=event)
         if form.is_valid():
             event = form.save(commit=False)
-            tz = pytz.timezone(request.POST['timezone'])
-            event.start_time = tz_apply(event.start_time, tz)
-            if event.archive_time:
-                event.archive_time = tz_apply(event.archive_time, tz)
-            if 'approvals' in form.cleaned_data:
-                approvals_old = [app.group for app in event.approval_set.all()]
-                approvals_new = form.cleaned_data['approvals']
-                approvals_add = set(approvals_new).difference(approvals_old)
-                approvals_remove = set(approvals_old).difference(approvals_new)
-                for approval in approvals_add:
-                    group = Group.objects.get(name=approval)
-                    app = Approval(group=group, event=event)
-                    app.save()
-                    emails = [u.email for u in group.user_set.all()]
-                    subject = ('[Air Mozilla] Approval requested: "%s"' %
-                               event.title)
-                    message = render_to_string(
-                        'manage/_email_approval.html',
-                        {
-                            'group': group.name,
-                            'manage_url': request.build_absolute_uri(
-                                reverse('manage:approvals')
-                            ),
-                            'title': event.title,
-                            'creator': event.creator.email,
-                            'datetime': event.start_time,
-                            'description': event.description
-                        }
-                    )
-                    email = EmailMessage(subject, message,
-                                         settings.EMAIL_FROM_ADDRESS, emails)
-                    email.send()
-                for approval in approvals_remove:
-                    app = Approval.objects.get(group=approval, event=event)
-                    app.delete()
-            event.modified_user = request.user
+            _event_process(request, form, event)
             event.save()
             form.save_m2m()
             messages.info(request, 'Event "%s" saved.' % event.title)
