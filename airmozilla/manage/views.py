@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import (permission_required,
                                             user_passes_test)
 from django.contrib.auth.models import User, Group
+from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -69,6 +70,7 @@ def user_edit(request, id):
         form = forms.UserEditForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+            messages.info(request, 'User %s saved.' % user.email)
             return redirect('manage:users')
     else:
         form = forms.UserEditForm(instance=user)
@@ -94,6 +96,7 @@ def group_edit(request, id):
         form = forms.GroupEditForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
+            messages.info(request, 'Group "%s" saved.' % group.name)
             return redirect('manage:groups')
     else:
         form = forms.GroupEditForm(instance=group)
@@ -110,6 +113,7 @@ def group_new(request):
         form = forms.GroupEditForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Group "%s" created.' % group.name)
             return redirect('manage:groups')
     else:
         form = forms.GroupEditForm(instance=group)
@@ -122,6 +126,7 @@ def group_remove(request, id):
     if request.method == 'POST':
         group = Group.objects.get(id=id)
         group.delete()
+        messages.info(request, 'Group "%s" removed.' % group.name)
     return redirect('manage:groups')
 
 
@@ -147,6 +152,8 @@ def event_request(request):
             event.modified_user = request.user
             event.save()
             form.save_m2m()
+            messages.success(request,
+                             'Event request "%s" submitted.' % event.title)
             return redirect('manage:events')
     else:
         form = form_class()
@@ -250,6 +257,7 @@ def event_edit(request, id):
             event.modified_user = request.user
             event.save()
             form.save_m2m()
+            messages.info(request, 'Event "%s" saved.' % event.title)
             return redirect('manage:events')
     else:
         timezone.activate(pytz.timezone('UTC'))
@@ -264,6 +272,7 @@ def event_edit(request, id):
     return render(request, 'manage/event_edit.html', {'form': form,
                                                       'event': event})
 
+
 @staff_required
 @permission_required('main.change_event_others')
 @cancel_redirect('manage:events')
@@ -272,7 +281,7 @@ def event_duplicate(request, copy_id):
     copy_event = Event.objects.get(id=copy_id)
     tags = copy_event.tags.all()
     participants = copy_event.participants.all()
-    approvals = copy_event.approval_set.all() 
+    approvals = copy_event.approval_set.all()
     copy_event.pk = None
     copy_event.slug = None
     copy_event.save()
@@ -281,7 +290,9 @@ def event_duplicate(request, copy_id):
     for app in approvals:
         new_app = Approval(group=app.group, event=copy_event)
         new_app.save()
+    messages.success(request, 'Event "%s" duplicated.' % copy_event.title)
     return redirect('manage:event_edit', id=copy_event.id)
+
 
 @staff_required
 @permission_required('main.add_event')
@@ -327,6 +338,7 @@ def event_archive(request, id):
                 event.start_time + datetime.timedelta(minutes=minutes)
             )
             event.save()
+            messages.info(request, 'Event "%s" saved.' % event.title)
             return redirect('manage:events')
     else:
         form = forms.EventArchiveForm(instance=event)
@@ -341,6 +353,7 @@ def event_remove(request, id):
     if request.method == 'POST':
         event = Event.objects.get(id=id)
         event.delete()
+        messages.info(request, 'Event "%s" removed.' % event.title)
     return redirect('manage:events')
 
 
@@ -385,6 +398,8 @@ def participant_edit(request, id):
                                          instance=participant)
         if form.is_valid():
             form.save()
+            messages.info(request,
+                          'Participant "%s" saved.' % participant.name)
             if 'sendmail' in request.POST:
                 return redirect('manage:participant_email', id=participant.id)
             return redirect('manage:participants')
@@ -400,6 +415,7 @@ def participant_remove(request, id):
     if request.method == 'POST':
         participant = Participant.objects.get(id=id)
         participant.delete()
+        messages.info(request, 'Participant "%s" removed.' % participant.name)
     return redirect('manage:participants')
 
 
@@ -441,6 +457,7 @@ def participant_email(request, id):
         email = EmailMessage(subject, message, from_addr, [to_addr],
                              cc=cc, headers={'Reply-To': reply_to})
         email.send()
+        messages.success(request, 'Email sent to %s.' % to_addr)
         return redirect('manage:participants')
     else:
         return render(request, 'manage/participant_email.html',
@@ -461,6 +478,8 @@ def participant_new(request):
             participant = form.save(commit=False)
             participant.creator = request.user
             participant.save()
+            messages.success(request,
+                             'Participant "%s" created.' % participant.name)
             return redirect('manage:participants')
     else:
         form = forms.ParticipantEditForm()
@@ -484,6 +503,7 @@ def category_new(request):
         form = forms.CategoryForm(request.POST, instance=Category())
         if form.is_valid():
             form.save()
+            messages.success(request, 'Category created.')
             return redirect('manage:categories')
     else:
         form = forms.CategoryForm()
@@ -499,6 +519,7 @@ def category_edit(request, id):
         form = forms.CategoryForm(request.POST, instance=category)
         if form.is_valid():
             form.save()
+            messages.info(request, 'Category "%s" saved.' % category.name)
             return redirect('manage:categories')
     else:
         form = forms.CategoryForm(instance=category)
@@ -512,6 +533,7 @@ def category_remove(request, id):
     if request.method == 'POST':
         category = Category.objects.get(id=id)
         category.delete()
+        messages.info(request, 'Category "%s" removed.' % category.name)
     return redirect('manage:categories')
 
 
@@ -546,6 +568,7 @@ def template_edit(request, id):
         form = forms.TemplateEditForm(request.POST, instance=template)
         if form.is_valid():
             form.save()
+            messages.info(request, 'Template "%s" saved.' % template.name)
             return redirect('manage:templates')
     else:
         form = forms.TemplateEditForm(instance=template)
@@ -561,6 +584,7 @@ def template_new(request):
         form = forms.TemplateEditForm(request.POST, instance=Template())
         if form.is_valid():
             form.save()
+            messages.success(request, 'Template created.')
             return redirect('manage:templates')
     else:
         form = forms.TemplateEditForm()
@@ -573,6 +597,7 @@ def template_remove(request, id):
     if request.method == 'POST':
         template = Template.objects.get(id=id)
         template.delete()
+        messages.info(request, 'Template "%s" removed.' % template.name)
     return redirect('manage:templates')
 
 
@@ -592,6 +617,7 @@ def location_edit(request, id):
         form = forms.LocationEditForm(request.POST, instance=location)
         if form.is_valid():
             form.save()
+            messages.info(request, 'Location "%s" saved.' % location)
             return redirect('manage:locations')
     else:
         form = forms.LocationEditForm(instance=location)
@@ -607,6 +633,7 @@ def location_new(request):
         form = forms.LocationEditForm(request.POST, instance=Location())
         if form.is_valid():
             form.save()
+            messages.success(request, 'Location created.')
             if request.user.has_perm('main.change_location'):
                 return redirect('manage:locations')
             else:
@@ -622,6 +649,7 @@ def location_remove(request, id):
     if request.method == 'POST':
         location = Location.objects.get(id=id)
         location.delete()
+        messages.info(request, 'Location "%s" removed.' % location.name)
     return redirect('manage:locations')
 
 
@@ -661,6 +689,7 @@ def approval_review(request, id):
         approval.processed = True
         approval.user = request.user
         approval.save()
+        messages.info(request, '"%s" approval saved.' % approval.event.title)
         return redirect('manage:approvals')
     else:
         form = forms.ApprovalForm(instance=approval)
