@@ -134,10 +134,6 @@ class EventEditForm(EventRequestForm):
 
 
 class EventExperiencedRequestForm(EventEditForm):
-    approvals = forms.ModelMultipleChoiceField(
-        queryset=Group.objects.filter(permissions__codename='change_approval'),
-        required=False,
-    )
     class Meta(EventEditForm.Meta):
         exclude = ('featured', 'archive_time', 'slug')
         # Fields specified to enforce order
