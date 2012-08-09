@@ -17,8 +17,8 @@ from funfactory.urlresolvers import reverse
 from jinja2 import Environment, meta
 
 from airmozilla.base.utils import json_view, paginate, tz_apply
-from airmozilla.main.models import (Approval, Category, Event, EventOldSlug,
-                                    Location, Participant, Tag, Template)
+from airmozilla.main.models import (Approval, Category, Event, Location,
+                                    Participant, Tag, Template)
 from airmozilla.manage import forms
 
 
@@ -264,6 +264,24 @@ def event_edit(request, id):
     return render(request, 'manage/event_edit.html', {'form': form,
                                                       'event': event})
 
+@staff_required
+@permission_required('main.change_event_others')
+@cancel_redirect('manage:events')
+def event_duplicate(request, copy_id):
+    """Copy an event's data for use in a new event, then redirect to edit."""
+    copy_event = Event.objects.get(id=copy_id)
+    tags = copy_event.tags.all()
+    participants = copy_event.participants.all()
+    approvals = copy_event.approval_set.all() 
+    copy_event.pk = None
+    copy_event.slug = None
+    copy_event.save()
+    copy_event.participants.add(*participants)
+    copy_event.tags.add(*tags)
+    for app in approvals:
+        new_app = Approval(group=app.group, event=copy_event)
+        new_app.save()
+    return redirect('manage:event_edit', id=copy_event.id)
 
 @staff_required
 @permission_required('main.add_event')
@@ -322,9 +340,6 @@ def event_archive(request, id):
 def event_remove(request, id):
     if request.method == 'POST':
         event = Event.objects.get(id=id)
-        slugs = EventOldSlug.objects.filter(event=event)
-        for slug in slugs:
-            slug.delete()
         event.delete()
     return redirect('manage:events')
 
