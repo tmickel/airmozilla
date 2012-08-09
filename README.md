@@ -10,6 +10,7 @@ a web application template based on [Django][django],
 and adding some neat features along the way.
 
 Tracking bug: https://bugzilla.mozilla.org/show_bug.cgi?id=712717
+
 Wiki page: https://wiki.mozilla.org/Air_Mozilla
 
 Tests and test coverage
@@ -35,6 +36,7 @@ To generate a blank data migration, use:
 Then fill in the generated file with logic, fixtures, etc.
 
 To apply migrations:
+
 ``./manage.py migrate airmozilla.main``
 
 In each command, replace airmozilla.main with the appropriate app.
