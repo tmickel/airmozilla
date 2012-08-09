@@ -316,6 +316,7 @@ def event_archive(request, id):
     return render(request, 'manage/event_archive.html',
                   {'form': form, 'event': event})
 
+
 @staff_required
 @permission_required('main.delete_event')
 def event_remove(request, id):
@@ -376,6 +377,7 @@ def participant_edit(request, id):
         form = forms.ParticipantEditForm(instance=participant)
     return render(request, 'manage/participant_edit.html',
                   {'form': form, 'participant': participant})
+
 
 @staff_required
 @permission_required('main.delete_participant')
@@ -457,6 +459,7 @@ def categories(request):
     categories = Category.objects.all()
     return render(request, 'manage/categories.html',
                   {'categories': categories})
+
 
 @staff_required
 @permission_required('main.add_category')
