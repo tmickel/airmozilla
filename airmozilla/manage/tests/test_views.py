@@ -458,14 +458,14 @@ class TestCategories(TestCase):
 
     def test_category_new(self):
         """ Category form adds new categories. """
-        response_ok = self.client.post(reverse('manage:categories'),
+        response_ok = self.client.post(reverse('manage:category_new'),
             {
                 'name': 'Web Dev Talks '
             }
         )
-        eq_(response_ok.status_code, 200)
+        self.assertRedirects(response_ok, reverse('manage:categories'))
         ok_(Category.objects.get(name='Web Dev Talks'))
-        response_fail = self.client.post(reverse('manage:categories'))
+        response_fail = self.client.post(reverse('manage:category_new'))
         eq_(response_fail.status_code, 200)
 
 
