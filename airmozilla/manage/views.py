@@ -178,26 +178,53 @@ def _event_process(request, form, event):
 @staff_required
 @permission_required('main.add_event')
 @cancel_redirect('manage:events')
-def event_request(request):
+def event_request(request, duplicate_id=None):
     """Event request page:  create new events to be published."""
-    if request.user.has_perm('main.add_event_scheduled'):
+    if (request.user.has_perm('main.add_event_scheduled')
+            or request.user.has_perm('main.change_event_others')):
         form_class = forms.EventExperiencedRequestForm
     else:
         form_class = forms.EventRequestForm
+
+    initial = {}
+    event_initial = None
+    if duplicate_id:
+        # Use a blank event, but fill in the initial data from duplication_id
+        event_initial = Event.objects.get(id=duplicate_id)
+        # We copy the initial data from a form generated on the origin event
+        # to retain initial data processing, e.g., on EnvironmentField.
+        event_initial_form = form_class(instance=event_initial)
+        for field in event_initial_form.fields:
+            if field in event_initial_form.initial:
+                # Usual initial form data
+                initial[field] = event_initial_form.initial[field]
+            else:
+                # Populated by form __init__ (e.g., approvals)
+                initial[field] = event_initial_form.fields[field].initial
+        # Excluded fields in an event copy
+        blank_fields = ('slug', 'start_time')
+        for field in blank_fields:
+            initial[field] = ''
+
     if request.method == 'POST':
-        form = form_class(request.POST, request.FILES,
-                          instance=Event())
+        event = Event()
+        if duplicate_id and ('placeholder_img' not in request.FILES):
+            # If this is a duplicate event action and a placeholder_img
+            # was not provided, copy it from the duplication source.
+            event.placeholder_img = event_initial.placeholder_img
+        form = form_class(request.POST, request.FILES, instance=event)
         if form.is_valid():
             event = form.save(commit=False)
             _event_process(request, form, event)
             event.save()
             form.save_m2m()
             messages.success(request,
-                             'Event request "%s" submitted.' % event.title)
+                             'Event "%s" created.' % event.title)
             return redirect('manage:events')
     else:
-        form = form_class()
-    return render(request, 'manage/event_request.html', {'form': form})
+        form = form_class(initial=initial)
+    return render(request, 'manage/event_request.html', {'form': form,
+                  'duplicate_event': event_initial})
 
 
 @staff_required
@@ -255,6 +282,7 @@ def event_edit(request, id):
         form_class = forms.EventExperiencedRequestForm
     else:
         form_class = forms.EventRequestForm
+
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES, instance=event)
         if form.is_valid():
@@ -266,37 +294,11 @@ def event_edit(request, id):
             return redirect('manage:events')
     else:
         timezone.activate(pytz.timezone('UTC'))
-        tag_format = lambda objects: ','.join(map(unicode, objects))
-        participants_formatted = tag_format(event.participants.all())
-        tags_formatted = tag_format(event.tags.all())
         form = form_class(instance=event, initial={
-            'participants': participants_formatted,
-            'tags': tags_formatted,
             'timezone': timezone.get_current_timezone()  # UTC
         })
-    return render(request, 'manage/event_edit.html', {'form': form,
-                                                      'event': event})
-
-
-@staff_required
-@permission_required('main.change_event_others')
-@cancel_redirect('manage:events')
-def event_duplicate(request, copy_id):
-    """Copy an event's data for use in a new event, then redirect to edit."""
-    copy_event = Event.objects.get(id=copy_id)
-    tags = copy_event.tags.all()
-    participants = copy_event.participants.all()
-    approvals = copy_event.approval_set.all()
-    copy_event.pk = None
-    copy_event.slug = None
-    copy_event.save()
-    copy_event.participants.add(*participants)
-    copy_event.tags.add(*tags)
-    for app in approvals:
-        new_app = Approval(group=app.group, event=copy_event)
-        new_app.save()
-    messages.success(request, 'Event "%s" duplicated.' % copy_event.title)
-    return redirect('manage:event_edit', id=copy_event.id)
+    return render(request, 'manage/event_edit.html',
+                  {'form': form, 'event': event})
 
 
 @staff_required
@@ -350,16 +352,6 @@ def event_archive(request, id):
 
     return render(request, 'manage/event_archive.html',
                   {'form': form, 'event': event})
-
-
-@staff_required
-@permission_required('main.delete_event')
-def event_remove(request, id):
-    if request.method == 'POST':
-        event = Event.objects.get(id=id)
-        event.delete()
-        messages.info(request, 'Event "%s" removed.' % event.title)
-    return redirect('manage:events')
 
 
 @staff_required

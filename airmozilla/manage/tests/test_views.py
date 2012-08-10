@@ -366,9 +366,6 @@ class TestEvents(TestCase):
         eq_(event_modified.archive_time, 
             event_modified.start_time + datetime.timedelta(minutes=120))
 
-    def test_event_remove(self):
-        event = Event.objects.get(title='Test event')
-        _delete_test(self, event, 'manage:event_remove', 'manage:events')
 
 class TestParticipants(TestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
