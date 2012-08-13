@@ -155,8 +155,12 @@ class EventManager(models.Manager):
             start_time__lt=_get_live_time()
         )
 
-    def archived(self):
-        return self.approved().filter(
+    def archived(self, require_approved=True):
+        if require_approved:
+            query_set = self.approved()
+        else:
+            query_set = self.get_query_set()
+        return query_set.filter(
             archive_time__lt=_get_now(),
             start_time__lt=_get_now()
         )
@@ -175,9 +179,11 @@ class Event(models.Model):
     )
     STATUS_INITIATED = 'initiated'
     STATUS_SCHEDULED = 'scheduled'
+    STATUS_REMOVED = 'removed'
     STATUS_CHOICES = (
         (STATUS_INITIATED, 'Initiated'),
-        (STATUS_SCHEDULED, 'Scheduled')
+        (STATUS_SCHEDULED, 'Scheduled'),
+        (STATUS_REMOVED, 'Removed')
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,
                               default=STATUS_INITIATED)
@@ -224,6 +230,9 @@ class Event(models.Model):
     def is_upcoming(self):
         return (self.archive_time is None and
                 self.start_time > _get_live_time())
+    
+    def is_removed(self):
+        return self.status == self.STATUS_REMOVED
 
 
 class EventOldSlug(models.Model):
