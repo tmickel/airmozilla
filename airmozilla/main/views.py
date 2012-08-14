@@ -47,9 +47,9 @@ def event(request, slug):
     if not event.public and not request.user.is_active:
         return redirect('main:login')
     if event.status != Event.STATUS_SCHEDULED:
-        raise Http404
+        raise Http404('Event not scheduled')
     if event.approval_set.filter(approved=False).exists():
-        raise Http404
+        raise Http404('Event not approved')
     template_tagged = ''
     if event.template and not event.is_upcoming():
         context = {
