@@ -253,7 +253,7 @@ def events(request):
             .order_by('start_time'))
     archiving = (Event.objects.archiving().filter(**creator_filter)
                  .order_by('-archive_time'))
-    archived = (Event.objects.archived(require_approved=False)
+    archived = (Event.objects.archived(include_removed=True)
                 .filter(**creator_filter) .order_by('-archive_time'))
     archived_paged = paginate(archived, request.GET.get('page'), 10)
     return render(request, 'manage/events.html', {

@@ -44,8 +44,9 @@ def event(request, slug):
     except Event.DoesNotExist:
         old_slug = get_object_or_404(EventOldSlug, slug=slug)
         return redirect('main:event', slug=old_slug.event.slug)
-    if ((not event.public or event.status != Event.STATUS_SCHEDULED)
-         and not request.user.is_active):
+    if (not event.public and not request.user.is_active):
+        return redirect('main:login')
+    if event.status != Event.STATUS_SCHEDULED:
         raise Http404
     if event.approval_set.filter(approved=False).exists():
         raise Http404
