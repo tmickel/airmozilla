@@ -57,12 +57,12 @@ def event(request, slug):
         if not request.user.is_active:
             raise Http404('Event not scheduled')
         else:
-            warning = "Event is not visible - not scheduled."
+            warning = "Event is not publicly visible - not scheduled."
     if event.approval_set.filter(approved=False).exists():
         if not request.user.is_active:
             raise Http404('Event not approved')
         else:
-            warning = "Event is not visible - not yet approved."
+            warning = "Event is not publicly visible - not yet approved."
     template_tagged = ''
     if event.template and not event.is_upcoming():
         context = {
