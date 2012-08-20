@@ -52,10 +52,17 @@ def event(request, slug):
         return redirect('main:event', slug=old_slug.event.slug)
     if not event.public and not request.user.is_active:
         return redirect('main:login')
+    warning = None
     if event.status != Event.STATUS_SCHEDULED:
-        raise Http404('Event not scheduled')
+        if not request.user.is_active:
+            raise Http404('Event not scheduled')
+        else:
+            warning = "Event is not visible - not scheduled."
     if event.approval_set.filter(approved=False).exists():
-        raise Http404('Event not approved')
+        if not request.user.is_active:
+            raise Http404('Event not approved')
+        else:
+            warning = "Event is not visible - not yet approved."
     template_tagged = ''
     if event.template and not event.is_upcoming():
         context = {
@@ -73,6 +80,7 @@ def event(request, slug):
         'event': event,
         'video': template_tagged,
         'participants': participants,
+        'warning': warning
     })
 
 

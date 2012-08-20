@@ -32,6 +32,9 @@
           {{ _('Location') }}: {{ event.location.name }}
         {% endif %}
       </p>
+      {% if warning %}
+        <div class="warning">WARNING: {{ warning }}</div>
+      {% endif %}
     </header>
     <div class="entry-content">
       {% if video %}
