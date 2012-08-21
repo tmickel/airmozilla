@@ -97,20 +97,14 @@ class TestPages(TestCase):
 
     def test_calendars(self):
         """Calendars respond successfully."""
-        response = self.client.get(reverse('main:calendar'))
-        eq_(response.status_code, 200)
-        response = self.client.get(reverse('main:private_calendar'))
-        eq_(response.status_code, 200)
-
-class TestCaches(TestCase):
-    fixtures = ['airmozilla/manage/tests/main_testdata.json']
-
-    def test_calendar_cache(self):
-        response = self.client.get(reverse('main:calendar'))
-        eq_(response.status_code, 200)
+        response_public = self.client.get(reverse('main:calendar'))
+        eq_(response_public.status_code, 200)
+        response_private = self.client.get(reverse('main:private_calendar'))
+        eq_(response_private.status_code, 200)
+        # Cache tests
         event_change = Event.objects.get(id=22)
         event_change.title = 'Hello cache clear!'
         event_change.save()
         response_changed = self.client.get(reverse('main:calendar'))
-        ok_(response_changed.content != response.content)
+        ok_(response_changed.content != response_public.content)
         ok_('cache clear' in response_changed.content)
