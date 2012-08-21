@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils.timezone import utc
 
 from funfactory.urlresolvers import reverse
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 from airmozilla.main.models import Approval, Event, EventOldSlug, Participant
 
@@ -101,3 +101,16 @@ class TestPages(TestCase):
         eq_(response.status_code, 200)
         response = self.client.get(reverse('main:private_calendar'))
         eq_(response.status_code, 200)
+
+class TestCaches(TestCase):
+    fixtures = ['airmozilla/manage/tests/main_testdata.json']
+
+    def test_calendar_cache(self):
+        response = self.client.get(reverse('main:calendar'))
+        eq_(response.status_code, 200)
+        event_change = Event.objects.get(id=22)
+        event_change.title = 'Hello cache clear!'
+        event_change.save()
+        response_changed = self.client.get(reverse('main:calendar'))
+        ok_(response_changed.content != response.content)
+        ok_('cache clear' in response_changed.content)
