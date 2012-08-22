@@ -51,6 +51,7 @@ class Command(BaseCommand):
                     try:
                         perm_obj = Permission.objects.get(codename=perm)
                         group.permissions.add(perm_obj)
+                        print "\tAttaching permission %s" % perm
                     except Permission.DoesNotExist:
-                        logging.warning("Skipping permission %s" % perm)
+                        print "\tSkipping permission %s" % perm
                 group.save()
