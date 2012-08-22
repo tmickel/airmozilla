@@ -138,8 +138,7 @@ class EventManager(models.Manager):
     def approved(self):
         return (self.get_query_set().exclude(approval__approved=False)
                     .exclude(approval__processed=False)
-                    .exclude(status=Event.STATUS_REMOVED)
-                    .exclude(status=Event.STATUS_INITIATED))
+                    .filter(status=Event.STATUS_SCHEDULED))
 
     def upcoming(self):
         return self.approved().filter(
