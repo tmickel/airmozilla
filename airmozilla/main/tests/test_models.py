@@ -21,18 +21,24 @@ class EventStateTests(TestCase):
         )
         ok_(initiated in Event.objects.initiated())
         # scheduled event with pending approval
-        unapproved = Event.objects.create(
+        to_approve = Event.objects.create(
             status=Event.STATUS_SCHEDULED,
             start_time=time_now,
         )
-        ok_(unapproved not in Event.objects.initiated())
-        Approval.objects.create(event=unapproved, group=None)
-        ok_(unapproved not in Event.objects.approved())
-        ok_(unapproved in Event.objects.initiated())
-        unapproved.status = Event.STATUS_REMOVED
-        unapproved.save()
-        ok_(unapproved in Event.objects.archived_and_removed())
-        ok_(unapproved in Event.objects.initiated())
+        ok_(to_approve not in Event.objects.initiated())
+        ok_(to_approve in Event.objects.approved())
+        app = Approval.objects.create(event=to_approve, group=None)
+        # attaching the Approval makes the event unapproved
+        ok_(to_approve not in Event.objects.approved())
+        ok_(to_approve in Event.objects.initiated())
+        app.processed = True
+        app.approved = True
+        app.save()
+        ok_(to_approve in Event.objects.approved())
+        to_approve.status = Event.STATUS_REMOVED
+        to_approve.save()
+        ok_(to_approve in Event.objects.archived_and_removed())
+        ok_(to_approve not in Event.objects.initiated())
         # upcoming event
         upcoming = Event.objects.create(
             status=Event.STATUS_SCHEDULED,
